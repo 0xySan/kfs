@@ -105,5 +105,7 @@ void terminal_writestring(const char* data);
 void terminal_putentryat(char c, uint8_t color, size_t x, size_t y);
 void handle_backspace(void);
 char scancode_to_ascii(uint8_t scancode);
+int kprintf(const char *format, ...);
+int printk(const char *level, const char *format, ...);
 
 #endif

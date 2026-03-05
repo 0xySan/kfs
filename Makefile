@@ -5,7 +5,7 @@ AS	= i686-elf-as
 CFLAGS	= -std=gnu99 -ffreestanding -fno-builtin -fno-stack-protector -nostdlib -Wall -Wextra
 LDFLAGS	= -ffreestanding -nostdlib -nodefaultlibs -lgcc
 
-SRCS_C	= kernel.c terminal.c keyboard.c
+SRCS_C	= kernel.c terminal.c keyboard.c printk.c
 SRCS_S	= boot.s
 OBJS	= $(SRCS_S:.s=.o) $(SRCS_C:.c=.o)
 

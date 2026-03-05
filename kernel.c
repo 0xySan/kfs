@@ -65,7 +65,11 @@ void kernel_main(void)
 	terminal_writestring("2\n");
 	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
 	terminal_setcolumn((VGA_WIDTH - 23) / 2);
-	terminal_writestring("Hello\tkernel\tWorld!\n");
+	terminal_writestring("Hello\tkernel\tWorld!\n\n");
+	terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
+	printk("INFO", "kprintf/printk ready\n");
+	kprintf("VGA %ux%u | test: %d %u 0x%x %c %s\n",
+		VGA_WIDTH, VGA_HEIGHT, -42, 42U, 42U, 'A', "ok");
 
 	/* Set up the IDT and PIC, then enable interrupts. */
 	idt_init();
