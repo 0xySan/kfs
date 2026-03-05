@@ -107,5 +107,6 @@ void handle_backspace(void);
 char scancode_to_ascii(uint8_t scancode);
 int kprintf(const char *format, ...);
 int printk(const char *level, const char *format, ...);
+void dump_kernel_stack(size_t words);
 
 #endif

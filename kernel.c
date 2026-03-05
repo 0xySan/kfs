@@ -2,6 +2,32 @@
 
 struct idt_entry idt[IDT_SIZE];
 
+void dump_kernel_stack(size_t words)
+{
+	uintptr_t	esp;
+	uintptr_t	ebp;
+	uint32_t	*ptr;
+	size_t		i;
+
+	__asm__ volatile ("mov %%esp, %0" : "=r"(esp));
+	__asm__ volatile ("mov %%ebp, %0" : "=r"(ebp));
+
+	printk("STACK", "esp=0x%x ebp=0x%x words=%u\n",
+		(unsigned int)esp, (unsigned int)ebp, (unsigned int)words);
+
+	ptr = (uint32_t *)esp;
+
+	i = 0;
+	while (i < words)
+	{
+		printk("STACK", "[+0x%x] @0x%x = 0x%x\n",
+			(unsigned int)(i * sizeof(uint32_t)),
+			(unsigned int)(uintptr_t)(ptr + i),
+			ptr[i]);
+		i++;
+	}
+}
+
 void idt_set_gate(uint8_t num, uint32_t handler_address,
 				  uint16_t selector, uint8_t type_attr)
 {
@@ -80,6 +106,7 @@ void kernel_main(void)
 	terminal_setrow(0);
 	terminal_setcolumn(0);
 	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
+	dump_kernel_stack(8);
 
 	/* Main loop: wait for keyboard input and print it to the terminal. */
 	while (1)

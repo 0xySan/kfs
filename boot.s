@@ -68,8 +68,15 @@ _start:
 	/* Clear direction flag (required by System V ABI) */
 	cld
 
-	/* Load our own GDT — GRUB's is not guaranteed to persist */
-	lgdt gdt_descriptor
+	/* Copy GDT + descriptor to the required physical address 0x00000800 */
+	mov $gdt_blob_start, %esi
+	mov $GDT_BASE, %edi
+	mov $(gdt_blob_end - gdt_blob_start), %ecx
+	rep movsb
+
+	/* Load our GDT from 0x00000800 — GRUB's GDT is not guaranteed to persist */
+	mov $GDT_DESC_ADDR, %eax
+	lgdt (%eax)
 	ljmp $0x08, $reload_segments
 
 reload_segments:
@@ -78,6 +85,7 @@ reload_segments:
 	mov %ax, %es
 	mov %ax, %fs
 	mov %ax, %gs
+	mov $0x18, %ax
 	mov %ax, %ss
 
 	call kernel_main
@@ -125,35 +133,75 @@ keyboard_handler_stub:
     popa
     iret
 
+/* Required location for runtime GDT. */
+.set GDT_BASE, 0x00000800
+.set GDT_ENTRY_SIZE, 8
+.set GDT_ENTRY_COUNT, 7
+.set GDT_TABLE_SIZE, GDT_ENTRY_SIZE * GDT_ENTRY_COUNT
+.set GDT_DESC_ADDR, GDT_BASE + GDT_TABLE_SIZE
+
 /*
-Global Descriptor Table — needed for interrupt dispatch.
-GRUB sets up segment registers but the Multiboot spec says its GDT
-must not be relied upon, so we define our own.
+Global Descriptor Table template.
+Runtime copy lives at 0x00000800 and includes:
+  - null
+  - kernel code
+  - kernel data
+  - kernel stack
+  - user code
+  - user data
+  - user stack
 */
 .section .rodata
 .align 8
-gdt_start:
+gdt_blob_start:
 	/* Null descriptor */
 	.long 0
 	.long 0
-	/* Code segment: base=0, limit=4G, 32-bit, ring 0, exec+read */
+	/* Kernel code segment: base=0, limit=4G, 32-bit, ring 0, exec+read */
 	.word 0xFFFF
 	.word 0x0000
 	.byte 0x00
 	.byte 0x9A
 	.byte 0xCF
 	.byte 0x00
-	/* Data segment: base=0, limit=4G, 32-bit, ring 0, read+write */
+	/* Kernel data segment: base=0, limit=4G, 32-bit, ring 0, read+write */
 	.word 0xFFFF
 	.word 0x0000
 	.byte 0x00
 	.byte 0x92
 	.byte 0xCF
 	.byte 0x00
-/* The GDT must be 8-byte aligned, so the size of the GDT is a multiple of 8. */
-gdt_end:
+	/* Kernel stack segment: base=0, limit=4G, 32-bit, ring 0, expand-down rw */
+	.word 0xFFFF
+	.word 0x0000
+	.byte 0x00
+	.byte 0x96
+	.byte 0xCF
+	.byte 0x00
+	/* User code segment: base=0, limit=4G, 32-bit, ring 3, exec+read */
+	.word 0xFFFF
+	.word 0x0000
+	.byte 0x00
+	.byte 0xFA
+	.byte 0xCF
+	.byte 0x00
+	/* User data segment: base=0, limit=4G, 32-bit, ring 3, read+write */
+	.word 0xFFFF
+	.word 0x0000
+	.byte 0x00
+	.byte 0xF2
+	.byte 0xCF
+	.byte 0x00
+	/* User stack segment: base=0, limit=4G, 32-bit, ring 3, expand-down rw */
+	.word 0xFFFF
+	.word 0x0000
+	.byte 0x00
+	.byte 0xF6
+	.byte 0xCF
+	.byte 0x00
 
-/* GDT descriptor for lgdt instruction. */
-gdt_descriptor:
-	.word gdt_end - gdt_start - 1
-	.long gdt_start
+/* GDT descriptor, copied right after the table to 0x00000800 + 56. */
+gdt_descriptor_template:
+	.word GDT_TABLE_SIZE - 1
+	.long GDT_BASE
+gdt_blob_end:
