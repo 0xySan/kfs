@@ -123,7 +123,7 @@ load_idt:
     ret
 
 /* This is a stub for the keyboard interrupt handler. The actual handler is
-defined in kernel.c. The keyboard interrupt is IRQ1, which corresponds to
+defined in keyboard.c. The keyboard interrupt is IRQ1, which corresponds to
 interrupt vector 33 (0x21) in the IDT. The handler must end with an iret
 instruction to return from the interrupt. */
 .global keyboard_handler_stub
