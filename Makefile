@@ -38,9 +38,11 @@ fclean: clean
 	@rm -rf iso
 	@echo "ISO directory removed."
 
-re: fclean all
+re:
+	@$(MAKE) fclean
+	@$(MAKE) all
 
-iso: re
+iso: $(NAME)
 	@echo "Creating ISO image..."
 	@mkdir -p iso/boot/grub
 	@cp $(NAME) iso/boot/
