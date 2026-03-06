@@ -1,6 +1,4 @@
-#include "idt.h"
-
-#include <stdarg.h>
+#include "kernel.h"
 
 static void put_char_count(char c, int *written)
 {

@@ -1,9 +1,10 @@
-#ifndef IDT_H
-# define IDT_H
+#ifndef KERNEL_H
+# define KERNEL_H
 
 # include <stdbool.h>
 # include <stddef.h>
 # include <stdint.h>
+# include <stdarg.h>
 
 # define IDT_SIZE	256
 # define VGA_WIDTH	80
@@ -88,6 +89,11 @@ static inline void io_wait(void)
 	outb(0x80, 0);
 }
 
+static inline uint16_t vga_entry(unsigned char uc, uint8_t color)
+{
+	return (uint16_t) uc | (uint16_t) color << 8;
+}
+
 void load_idt(struct idt_ptr *ptr);
 void keyboard_handler_stub(void);
 void keyboard_handler(void);
@@ -108,5 +114,6 @@ char scancode_to_ascii(uint8_t scancode);
 int kprintf(const char *format, ...);
 int printk(const char *level, const char *format, ...);
 void dump_kernel_stack(size_t words);
+void handle_arrow_keys(uint8_t arrow_key);
 
 #endif

@@ -1,4 +1,4 @@
-#include "idt.h"
+#include "kernel.h"
 
 static int shift_held = 0;
 static int caps_lock_on = 0;
@@ -24,6 +24,8 @@ void keyboard_handler(void)
 		shift_held = 0;
 	if (scancode == 0x3A)
 		caps_lock_on = !caps_lock_on;
+	if (scancode == 0x4D || scancode == 0x4B)
+		handle_arrow_keys(scancode);
 	if (!(scancode & 0x80)) {
 		char c = scancode_to_ascii(scancode);
 		if (c)

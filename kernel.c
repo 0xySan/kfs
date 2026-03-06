@@ -1,4 +1,4 @@
-#include "idt.h"
+#include "kernel.h"
 
 struct idt_entry idt[IDT_SIZE];
 
@@ -20,6 +20,7 @@ void dump_kernel_stack(size_t words)
 	i = 0;
 	while (i < words)
 	{
+		terminal_setcolor(vga_entry_color(i + 1, VGA_COLOR_BLACK));
 		printk("STACK", "[+0x%x] @0x%x = 0x%x\n",
 			(unsigned int)(i * sizeof(uint32_t)),
 			(unsigned int)(uintptr_t)(ptr + i),
@@ -92,10 +93,6 @@ void kernel_main(void)
 	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
 	terminal_setcolumn((VGA_WIDTH - 23) / 2);
 	terminal_writestring("Hello\tkernel\tWorld!\n\n");
-	terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-	printk("INFO", "kprintf/printk ready\n");
-	kprintf("VGA %ux%u | test: %d %u 0x%x %c %s\n",
-		VGA_WIDTH, VGA_HEIGHT, -42, 42U, 42U, 'A', "ok");
 
 	/* Set up the IDT and PIC, then enable interrupts. */
 	idt_init();
@@ -107,6 +104,11 @@ void kernel_main(void)
 	terminal_setcolumn(0);
 	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
 	dump_kernel_stack(8);
+	terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
+	printk("INFO", "kprintf/printk ready\n");
+	kprintf("VGA %ux%u | test: %d %u 0x%x %c %s\n",
+		VGA_WIDTH, VGA_HEIGHT, -42, 42U, 42U, 'A', "ok");
+	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
 
 	/* Main loop: wait for keyboard input and print it to the terminal. */
 	while (1)
