@@ -10,6 +10,7 @@
 # define VGA_WIDTH	80
 # define VGA_HEIGHT	25
 # define VGA_MEMORY	0xB8000
+# define TAB_WIDTH 4
 
 struct idt_entry {
 	uint16_t offset_low;

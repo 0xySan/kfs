@@ -5,6 +5,8 @@ size_t terminal_row;
 size_t terminal_column;
 uint8_t terminal_color;
 static size_t terminal_preferred_column;
+bool is_tab_space[VGA_HEIGHT][VGA_WIDTH]; // same dimensions as VGA
+bool is_cell_occupied[VGA_HEIGHT][VGA_WIDTH]; // tracks user-inserted cells, including ' '
 
 static size_t ft_strlen(const char* str)
 {
@@ -33,10 +35,18 @@ static void terminal_scroll_up(void)
 	for (size_t y = 1; y < VGA_HEIGHT; y++)
 	{
 		for (size_t x = 0; x < VGA_WIDTH; x++)
+		{
 			terminal_buffer[(y - 1) * VGA_WIDTH + x] = terminal_buffer[y * VGA_WIDTH + x];
+			is_tab_space[y - 1][x] = is_tab_space[y][x];
+			is_cell_occupied[y - 1][x] = is_cell_occupied[y][x];
+		}
 	}
 	for (size_t x = 0; x < VGA_WIDTH; x++)
+	{
 		terminal_buffer[(VGA_HEIGHT - 1) * VGA_WIDTH + x] = vga_entry(' ', terminal_color);
+		is_tab_space[VGA_HEIGHT - 1][x] = false;
+		is_cell_occupied[VGA_HEIGHT - 1][x] = false;
+	}
 }
 
 static void terminal_advance_cursor(void)
@@ -61,6 +71,15 @@ static void terminal_insert_char(char c)
 	for (size_t i = row_end; i > cursor; i--)
 		terminal_buffer[i] = terminal_buffer[i - 1];
 	terminal_buffer[cursor] = vga_entry(c, terminal_color);
+
+	for (size_t x = VGA_WIDTH - 1; x > terminal_column; x--)
+	{
+		is_tab_space[terminal_row][x] = is_tab_space[terminal_row][x - 1];
+		is_cell_occupied[terminal_row][x] = is_cell_occupied[terminal_row][x - 1];
+	}
+	is_tab_space[terminal_row][terminal_column] = false;
+	is_cell_occupied[terminal_row][terminal_column] = true;
+
 	terminal_advance_cursor();
 }
 
@@ -70,10 +89,40 @@ static int terminal_row_last_filled_col(size_t row)
 	for (size_t x = VGA_WIDTH; x > 0; x--)
 	{
 		uint16_t entry = terminal_buffer[row * VGA_WIDTH + (x - 1)];
-		if ((char)(entry & 0xFF) != ' ')
+		if (is_cell_occupied[row][x - 1]
+			|| (char)(entry & 0xFF) != ' '
+			|| is_tab_space[row][x - 1])
 			return (int)(x - 1);
 	}
 	return -1;
+}
+
+static size_t terminal_tab_span_before_cursor(size_t row, size_t column)
+{
+	size_t start;
+
+	if (column == 0 || !is_tab_space[row][column - 1])
+		return 1;
+	start = column - 1;
+	while (start > 0
+		&& is_tab_space[row][start - 1]
+		&& (start % TAB_WIDTH) != 0)
+		start--;
+	return column - start;
+}
+
+static size_t terminal_tab_span_after_cursor(size_t row, size_t column, size_t max_col)
+{
+	size_t end;
+
+	if (column >= max_col || !is_tab_space[row][column])
+		return 1;
+	end = column + 1;
+	while (end < max_col
+		&& is_tab_space[row][end]
+		&& (end % TAB_WIDTH) != 0)
+		end++;
+	return end - column;
 }
 
 static size_t terminal_row_max_cursor_col(size_t row)
@@ -92,11 +141,20 @@ static void terminal_delete_char_before_cursor(void)
 	size_t row_base;
 	size_t cursor;
 	size_t row_end;
+	size_t chars_to_delete = 1;
 
 	if (terminal_row == 0 && terminal_column == 0)
 		return;
 	if (terminal_column > 0)
-		terminal_column--;
+	{
+		chars_to_delete = terminal_tab_span_before_cursor(terminal_row, terminal_column);
+		for (size_t j = 0; j < chars_to_delete; j++)
+		{
+			is_tab_space[terminal_row][terminal_column - chars_to_delete + j] = false;
+			is_cell_occupied[terminal_row][terminal_column - chars_to_delete + j] = false;
+		}
+		terminal_column -= chars_to_delete;
+	}
 	else
 	{
 		terminal_row--;
@@ -108,9 +166,18 @@ static void terminal_delete_char_before_cursor(void)
 	row_base = terminal_row * VGA_WIDTH;
 	cursor = terminal_cursor_index();
 	row_end = row_base + VGA_WIDTH - 1;
-	for (size_t i = cursor; i < row_end; i++)
-		terminal_buffer[i] = terminal_buffer[i + 1];
-	terminal_buffer[row_end] = vga_entry(' ', terminal_color);
+	for (size_t i = cursor; i + chars_to_delete <= row_end; i++)
+	{
+		terminal_buffer[i] = terminal_buffer[i + chars_to_delete];
+		is_tab_space[terminal_row][i - row_base] = is_tab_space[terminal_row][i - row_base + chars_to_delete];
+		is_cell_occupied[terminal_row][i - row_base] = is_cell_occupied[terminal_row][i - row_base + chars_to_delete];
+	}
+	for (size_t i = 0; i < chars_to_delete; i++)
+	{
+		terminal_buffer[row_end - i] = vga_entry(' ', terminal_color);
+		is_tab_space[terminal_row][VGA_WIDTH - 1 - i] = false;
+		is_cell_occupied[terminal_row][VGA_WIDTH - 1 - i] = false;
+	}
 }
 
 void terminal_initialize(void)
@@ -124,6 +191,8 @@ void terminal_initialize(void)
 		for (size_t x = 0; x < VGA_WIDTH; x++) {
 			const size_t index = y * VGA_WIDTH + x;
 			terminal_buffer[index] = vga_entry(' ', terminal_color);
+			is_tab_space[y][x] = false;
+			is_cell_occupied[y][x] = false;
 		}
 	}
 	terminal_update_cursor();
@@ -176,12 +245,14 @@ void handle_arrow_keys(uint8_t arrow_key)
 	{
 		size_t max_col = terminal_row_max_cursor_col(terminal_row);
 		if (terminal_column < max_col)
-			terminal_column++;
+			terminal_column += terminal_tab_span_after_cursor(terminal_row,
+					terminal_column, max_col);
 	}
 	else if (arrow_key == 0x4B) // Left Arrow
 	{
 		if (terminal_column > 0)
-			terminal_column--;
+			terminal_column -= terminal_tab_span_before_cursor(terminal_row,
+					terminal_column);
 	}
 	terminal_update_cursor();
 }
@@ -190,7 +261,20 @@ void terminal_write(const char* data, size_t size)
 {
 	for (size_t i = 0; i < size; i++)
 	{
-		if (data[i] == '\n')
+		if (data[i] == '\t')
+		{
+			size_t tab_start_row = terminal_row;
+			size_t tab_start_col = terminal_column;
+			size_t tab_width = TAB_WIDTH - (terminal_column % TAB_WIDTH);
+			for (size_t j = 0; j < tab_width; j++)
+				terminal_insert_char(' ');
+			if (terminal_row == tab_start_row)
+			{
+				for (size_t j = 0; j < tab_width; j++)
+					is_tab_space[tab_start_row][tab_start_col + j] = true;
+			}
+		}
+		else if (data[i] == '\n')
 		{
 			terminal_column = 0;
 			if (++terminal_row == VGA_HEIGHT)

@@ -92,7 +92,7 @@ void kernel_main(void)
 	terminal_writestring("2\n");
 	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
 	terminal_setcolumn((VGA_WIDTH - 23) / 2);
-	terminal_writestring("Hello\tkernel\tWorld!\n\n");
+	terminal_writestring("Hello\t kernel\t\tWorld!\n\n");
 
 	/* Set up the IDT and PIC, then enable interrupts. */
 	idt_init();
