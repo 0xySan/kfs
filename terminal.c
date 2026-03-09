@@ -283,7 +283,7 @@ void terminal_write(const char* data, size_t size)
 				terminal_row = VGA_HEIGHT - 1;
 			}
 		}
-		else if (data[i] == 0x08)
+		else if (data[i] == '\b')
 			handle_backspace();
 		else
 			terminal_insert_char(data[i]);
