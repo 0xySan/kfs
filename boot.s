@@ -158,12 +158,12 @@ gdt_blob_start:
 	.long 0
 	.long 0
 	/* Kernel code segment: base=0, limit=4G, 32-bit, ring 0, exec+read */
-	.word 0xFFFF
-	.word 0x0000
-	.byte 0x00
-	.byte 0x9A
-	.byte 0xCF
-	.byte 0x00
+	.word 0xFFFF      /* Limit bits 0–15  = 0xFFFF                      */
+	.word 0x0000      /* Base  bits 0–15  = 0x0000                      */
+	.byte 0x00        /* Base  bits 16–23 = 0x00                        */
+	.byte 0x9A        /* Access byte                                    */
+	.byte 0xCF        /* Flags (4 bits) + Limit bits 16–19 (4 bits)     */
+	.byte 0x00        /* Base  bits 24–31 = 0x00                        */
 	/* Kernel data segment: base=0, limit=4G, 32-bit, ring 0, read+write */
 	.word 0xFFFF
 	.word 0x0000
