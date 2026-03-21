@@ -18,6 +18,7 @@ int execute_command(const char* command)
 		terminal_writestring("help - A help message to show you each commands available\n");
 		terminal_writestring("clear - Clear the terminal screen\n");
 		terminal_writestring("echo - Print the arguments passed to it\n");
+		terminal_writestring("dump - Dump the kernel stack (usage: dump [number])\n");
 		terminal_writestring("shutdown - Power off the machine\n");
 		terminal_writestring("reboot - Restart the machine\n");
 		return 0;
@@ -66,9 +67,7 @@ int execute_command(const char* command)
 				terminal_writestring("Usage: dump [words]\n");
 		}
 		else
-		{
 			dump_kernel_stack(8);
-		}
 		return 0;
 	}
 
