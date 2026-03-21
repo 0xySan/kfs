@@ -16,19 +16,44 @@ struct terminal_screen {
 static struct terminal_screen screens[TERMINAL_SCREEN_COUNT];
 static size_t active_screen;
 static struct terminal_screen* terminal_current_screen(void);
-
-
-static size_t ft_strlen(const char* str)
-{
-	size_t len = 0;
-	while (str[len])
-		len++;
-	return len;
-}
+static bool execute_on_newline = true;
+static int terminal_row_last_filled_col(size_t row);
 
 static size_t terminal_locked_prefix_col(size_t row)
 {
 	return terminal_current_screen()->locked_prefix_col[row];
+}
+
+static void terminal_collect_current_command(char* out, size_t out_size)
+{
+	struct terminal_screen* screen = terminal_current_screen();
+	size_t row = screen->row;
+	size_t start = terminal_locked_prefix_col(row);
+	int last_col = terminal_row_last_filled_col(row);
+	size_t out_i = 0;
+
+	if (out_size == 0)
+		return;
+	if (last_col < 0 || (size_t)last_col < start)
+	{
+		out[0] = '\0';
+		return;
+	}
+	while ((size_t)last_col >= start)
+	{
+		char c = (char)(screen->cells[row * VGA_WIDTH + (size_t)last_col] & 0xFF);
+		if (c != ' ')
+			break;
+		last_col--;
+	}
+	if (last_col < 0 || (size_t)last_col < start)
+	{
+		out[0] = '\0';
+		return;
+	}
+	for (size_t x = start; x <= (size_t)last_col && out_i + 1 < out_size; x++)
+		out[out_i++] = (char)(screen->cells[row * VGA_WIDTH + x] & 0xFF);
+	out[out_i] = '\0';
 }
 
 static struct terminal_screen* terminal_current_screen(void)
@@ -67,9 +92,9 @@ static void terminal_seed_initial_content_for_screen(size_t screen_id)
 	terminal_write_text_for_screen(screen_id, TERMINAL_PROMPT_ROW, 0,
 		TERMINAL_PROMPT_TEXT, text_color);
 	screen->locked_prefix_col[TERMINAL_CONTENT_START_ROW] =
-		(uint8_t)ft_strlen(TERMINAL_BANNER_TEXT);
+		(uint8_t)strlen(TERMINAL_BANNER_TEXT);
 	screen->locked_prefix_col[TERMINAL_PROMPT_ROW] =
-		(uint8_t)ft_strlen(TERMINAL_PROMPT_TEXT);
+		(uint8_t)strlen(TERMINAL_PROMPT_TEXT);
 	screen->row = TERMINAL_PROMPT_ROW;
 	screen->column = TERMINAL_PROMPT_COL;
 	screen->preferred_column = TERMINAL_PROMPT_COL;
@@ -124,7 +149,7 @@ static void terminal_redraw_status_bars(void)
 		terminal_draw_status_bar_for_screen(i);
 }
 
-static void terminal_flush_active_screen(void)
+void terminal_flush_active_screen(void)
 {
 	struct terminal_screen* screen = terminal_current_screen();
 
@@ -175,9 +200,13 @@ static void terminal_scroll_up(void)
 	screen->locked_prefix_col[VGA_HEIGHT - 1] = 0;
 }
 
-static void terminal_newline_with_prompt(void)
+void terminal_newline_with_prompt(void)
 {
 	struct terminal_screen* screen = terminal_current_screen();
+	char command[128];
+
+	if (execute_on_newline)
+		terminal_collect_current_command(command, sizeof(command));
 
 	screen->column = 0;
 	if (++screen->row == VGA_HEIGHT)
@@ -185,7 +214,28 @@ static void terminal_newline_with_prompt(void)
 		terminal_scroll_up();
 		screen->row = VGA_HEIGHT - 1;
 	}
-	screen->locked_prefix_col[screen->row] = (uint8_t)ft_strlen(TERMINAL_PROMPT_TEXT);
+	screen->locked_prefix_col[screen->row] = 0;
+
+	if (execute_on_newline)
+	{
+		execute_on_newline = false;
+		execute_command(command);
+		execute_on_newline = true;
+		if (screen->column != 0)
+		{
+			screen->column = 0;
+			if (++screen->row == VGA_HEIGHT)
+			{
+				terminal_scroll_up();
+				screen->row = VGA_HEIGHT - 1;
+			}
+			screen->locked_prefix_col[screen->row] = 0;
+		}
+	}
+
+	if (!execute_on_newline)
+		return;
+	screen->locked_prefix_col[screen->row] = (uint8_t)strlen(TERMINAL_PROMPT_TEXT);
 	for (size_t i = 0; TERMINAL_PROMPT_TEXT[i] != '\0'; i++)
 		terminal_insert_char(TERMINAL_PROMPT_TEXT[i]);
 }
@@ -355,6 +405,50 @@ static void terminal_delete_char_before_cursor(void)
 	}
 }
 
+void terminal_clear(void)
+{
+	struct terminal_screen* screen = terminal_current_screen();
+
+	for (size_t y = TERMINAL_CONTENT_START_ROW; y < VGA_HEIGHT; y++)
+	{
+		for (size_t x = 0; x < VGA_WIDTH; x++)
+		{
+			size_t index = y * VGA_WIDTH + x;
+			screen->cells[index] = vga_entry(' ', screen->color);
+			screen->is_tab_space[y][x] = false;
+			screen->is_cell_occupied[y][x] = false;
+		}
+		screen->locked_prefix_col[y] = 0;
+	}
+	screen->row = TERMINAL_CONTENT_START_ROW;
+	screen->column = 0;
+	screen->preferred_column = 0;
+	terminal_redraw_status_bars();
+	terminal_flush_active_screen();
+	terminal_update_cursor();
+}
+
+void terminal_reset_session(void)
+{
+	struct terminal_screen* screen = terminal_current_screen();
+
+	for (size_t y = TERMINAL_CONTENT_START_ROW; y < VGA_HEIGHT; y++)
+	{
+		for (size_t x = 0; x < VGA_WIDTH; x++)
+		{
+			size_t index = y * VGA_WIDTH + x;
+			screen->cells[index] = vga_entry(' ', screen->color);
+			screen->is_tab_space[y][x] = false;
+			screen->is_cell_occupied[y][x] = false;
+		}
+		screen->locked_prefix_col[y] = 0;
+	}
+	terminal_seed_initial_content_for_screen(active_screen);
+	terminal_redraw_status_bars();
+	terminal_flush_active_screen();
+	terminal_update_cursor();
+}
+
 void terminal_initialize(void)
 {
 	for (size_t screen_id = 0; screen_id < TERMINAL_SCREEN_COUNT; screen_id++)
@@ -496,7 +590,7 @@ void terminal_write(const char* data, size_t size)
 
 void terminal_writestring(const char* data)
 {
-	terminal_write(data, ft_strlen(data));
+	terminal_write(data, strlen(data));
 }
 
 void terminal_switch_screen(size_t screen_index)

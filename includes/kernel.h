@@ -3,6 +3,7 @@
 
 # include "va_arg.h"
 # include "define.h"
+# include "helpers.h"
 
 struct idt_entry {
 	uint16_t offset_low;
@@ -67,6 +68,14 @@ static inline void outb(uint16_t port, uint8_t value)
 	);
 }
 
+static inline void outw(uint16_t port, uint16_t value)
+{
+	__asm__ volatile ("outw %0, %1"
+		:
+		: "a"(value), "Nd"(port)
+	);
+}
+
 static inline uint8_t inb(uint16_t port)
 {
 	uint8_t value;
@@ -110,5 +119,11 @@ void dump_kernel_stack(size_t words);
 void handle_arrow_keys(uint8_t arrow_key);
 void terminal_switch_screen(size_t screen_index);
 size_t terminal_get_active_screen(void);
+int execute_command(const char* command);
+void terminal_clear(void);
+void terminal_reset_session(void);
+void terminal_newline_with_prompt(void);
+void kernel_shutdown(void);
+void kernel_reboot(void);
 
 #endif

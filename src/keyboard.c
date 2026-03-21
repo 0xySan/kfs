@@ -3,6 +3,7 @@
 static int shift_held = 0;
 static int caps_lock_on = 0;
 static int alt_held = 0;
+static int ctrl_held = 0;
 
 static int handle_screen_shortcut(uint8_t scancode)
 {
@@ -37,6 +38,10 @@ void keyboard_handler(void)
 		alt_held = 1;
 	else if (scancode == 0xB8)
 		alt_held = 0;
+	if (scancode == 0x1D)
+		ctrl_held = 1;
+	else if (scancode == 0x9D)
+		ctrl_held = 0;
 	if (scancode == 0x3A)
 		caps_lock_on = !caps_lock_on;
 	if (scancode == 0x4D || scancode == 0x4B)
@@ -48,7 +53,14 @@ void keyboard_handler(void)
 			return;
 		}
 		char c = scancode_to_ascii(scancode);
-		if (c)
+		if (ctrl_held)
+		{
+			if (scancode == 0x2E) // Ctrl + C
+				terminal_write("^C\n", 3);
+			else if (scancode == 0x20) // Ctrl + D
+				terminal_reset_session();
+		}
+		else if (c)
 		{
 			if (caps_lock_on && c >= 'a' && c <= 'z')
 				c -= 32;

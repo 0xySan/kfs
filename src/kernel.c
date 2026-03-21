@@ -2,6 +2,38 @@
 
 struct idt_entry idt[IDT_SIZE];
 
+static void kernel_halt_forever(void)
+{
+	for (;;)
+		__asm__ volatile ("hlt");
+}
+
+void kernel_shutdown(void)
+{
+	__asm__ volatile ("cli");
+
+	/* QEMU/Bochs ACPI poweroff ports */
+	outw(0x604, 0x2000);
+	outw(0xB004, 0x2000);
+	outb(0xF4, 0x00);
+
+	kernel_halt_forever();
+}
+
+void kernel_reboot(void)
+{
+	__asm__ volatile ("cli");
+
+	/* Wait until keyboard controller input buffer is empty */
+	while (inb(0x64) & 0x02)
+		;
+
+	/* Pulse CPU reset line */
+	outb(0x64, 0xFE);
+
+	kernel_halt_forever();
+}
+
 void dump_kernel_stack(size_t words)
 {
 	uintptr_t	esp;
@@ -27,6 +59,7 @@ void dump_kernel_stack(size_t words)
 			ptr[i]);
 		i++;
 	}
+	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
 }
 
 void idt_set_gate(uint8_t num, uint32_t handler_address,

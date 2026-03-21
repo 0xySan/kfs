@@ -10,7 +10,7 @@ CPPFLAGS = -I$(INCDIR)
 CFLAGS	= -std=gnu99 -ffreestanding -fno-builtin -fno-stack-protector -nostdlib -Wall -Wextra
 LDFLAGS	= -ffreestanding -nostdlib -nodefaultlibs -lgcc
 
-SRCS_C	= $(SRCDIR)/kernel.c $(SRCDIR)/terminal.c $(SRCDIR)/keyboard.c $(SRCDIR)/printk.c
+SRCS_C	= $(SRCDIR)/kernel.c $(SRCDIR)/terminal.c $(SRCDIR)/keyboard.c $(SRCDIR)/printk.c $(SRCDIR)/bash.c $(SRCDIR)/helpers.c
 SRCS_S	= $(SRCDIR)/boot.s
 OBJDIR	= obj
 OBJS	= $(addprefix $(OBJDIR)/,$(SRCS_S:.s=.o) $(SRCS_C:.c=.o))
