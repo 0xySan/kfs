@@ -1,4 +1,4 @@
-#include "kernel.h"
+#include "../includes/kernel.h"
 
 struct idt_entry idt[IDT_SIZE];
 
@@ -83,31 +83,12 @@ void kernel_main(void)
 	/* Initialize terminal interface */
 	terminal_initialize();
 
-	terminal_setrow(VGA_HEIGHT / 2);
-	terminal_setcolumn((VGA_WIDTH - 2) / 2);
-
-	terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_LIGHT_BLUE));
-	terminal_writestring("4");
-	terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_LIGHT_RED));
-	terminal_writestring("2\n");
-	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
-	terminal_setcolumn((VGA_WIDTH - 23) / 2);
-	terminal_writestring("Hello\t kernel\t\tWorld!\n\n");
-
 	/* Set up the IDT and PIC, then enable interrupts. */
 	idt_init();
 	pic_init();
 	idt_set_gate(33, (uintptr_t)keyboard_handler_stub, 0x08, 0x8E);
 	__asm__ volatile ("sti");
 
-	terminal_setrow(0);
-	terminal_setcolumn(0);
-	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
-	dump_kernel_stack(8);
-	terminal_setcolor(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-	printk("INFO", "kprintf/printk ready\n");
-	kprintf("VGA %ux%u | test: %d %u 0x%x %c %s\n",
-		VGA_WIDTH, VGA_HEIGHT, -42, 42U, 42U, 'A', "ok");
 	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
 
 	/* Main loop: wait for keyboard input and print it to the terminal. */

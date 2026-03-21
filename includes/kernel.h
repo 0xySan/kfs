@@ -1,16 +1,8 @@
 #ifndef KERNEL_H
 # define KERNEL_H
 
-# include <stdbool.h>
-# include <stddef.h>
-# include <stdint.h>
-# include <stdarg.h>
-
-# define IDT_SIZE	256
-# define VGA_WIDTH	80
-# define VGA_HEIGHT	25
-# define VGA_MEMORY	0xB8000
-# define TAB_WIDTH 4
+# include "va_arg.h"
+# include "define.h"
 
 struct idt_entry {
 	uint16_t offset_low;
@@ -116,5 +108,7 @@ int kprintf(const char *format, ...);
 int printk(const char *level, const char *format, ...);
 void dump_kernel_stack(size_t words);
 void handle_arrow_keys(uint8_t arrow_key);
+void terminal_switch_screen(size_t screen_index);
+size_t terminal_get_active_screen(void);
 
 #endif

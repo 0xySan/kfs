@@ -1,7 +1,18 @@
-#include "kernel.h"
+#include "../includes/kernel.h"
 
 static int shift_held = 0;
 static int caps_lock_on = 0;
+static int alt_held = 0;
+
+static int handle_screen_shortcut(uint8_t scancode)
+{
+	if (scancode >= 0x02 && scancode < 0x02 + TERMINAL_SCREEN_COUNT)
+	{
+		terminal_switch_screen((size_t)(scancode - 0x02));
+		return 1;
+	}
+	return 0;
+}
 
 char scancode_to_ascii(uint8_t scancode)
 {
@@ -22,11 +33,20 @@ void keyboard_handler(void)
 		shift_held = 1;
 	else if (scancode == 0xAA || scancode == 0xB6)
 		shift_held = 0;
+	if (scancode == 0x38)
+		alt_held = 1;
+	else if (scancode == 0xB8)
+		alt_held = 0;
 	if (scancode == 0x3A)
 		caps_lock_on = !caps_lock_on;
 	if (scancode == 0x4D || scancode == 0x4B)
 		handle_arrow_keys(scancode);
 	if (!(scancode & 0x80)) {
+		if (alt_held && handle_screen_shortcut(scancode))
+		{
+			outb(0x20, 0x20);
+			return;
+		}
 		char c = scancode_to_ascii(scancode);
 		if (c)
 		{

@@ -2,33 +2,42 @@ NAME	= kfs
 CC	= i686-elf-gcc
 AS	= i686-elf-as
 
+SRCDIR	= src
+INCDIR	= includes
+LDSCRIPT = $(SRCDIR)/linker.ld
+
+CPPFLAGS = -I$(INCDIR)
 CFLAGS	= -std=gnu99 -ffreestanding -fno-builtin -fno-stack-protector -nostdlib -Wall -Wextra
 LDFLAGS	= -ffreestanding -nostdlib -nodefaultlibs -lgcc
 
-SRCS_C	= kernel.c terminal.c keyboard.c printk.c
-SRCS_S	= boot.s
-OBJS	= $(SRCS_S:.s=.o) $(SRCS_C:.c=.o)
+SRCS_C	= $(SRCDIR)/kernel.c $(SRCDIR)/terminal.c $(SRCDIR)/keyboard.c $(SRCDIR)/printk.c
+SRCS_S	= $(SRCDIR)/boot.s
+OBJDIR	= obj
+OBJS	= $(addprefix $(OBJDIR)/,$(SRCS_S:.s=.o) $(SRCS_C:.c=.o))
+DEPS	= $(OBJS:.o=.d)
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
 	@echo "Linking $(NAME)..."
-	@$(CC) -T linker.ld -o $(NAME) $(LDFLAGS) $(OBJS)
+	@$(CC) -T $(LDSCRIPT) -o $(NAME) $(LDFLAGS) $(OBJS)
 	@echo "Compilation finished. Output: $(NAME)"
 
-%.o: %.c
-	@echo "Compiling $<..."
-	@$(CC) -c $< -o $@ $(CFLAGS)
+$(OBJDIR)/%.o: %.c
+	@echo "\tCC $<"
+	@mkdir -p $(dir $@)
+	@$(CC) $(CPPFLAGS) $(CFLAGS) -MMD -MP -c $< -o $@
 
-%.o: %.s
-	@echo "Assembling $<..."
+$(OBJDIR)/%.o: %.s
+	@echo "\tAS $<"
+	@mkdir -p $(dir $@)
 	@$(AS) $< -o $@
 
+-include $(DEPS)
+
 clean:
-	@echo "Cleaning object files..."
-	@rm -f $(OBJS)
+	@rm -rf $(OBJDIR)
 	@rm -f *.iso
-	@echo "Object files removed."
 
 fclean: clean
 	@echo "Cleaning executable..."
@@ -44,7 +53,7 @@ iso: re
 	@echo "Creating ISO image..."
 	@mkdir -p iso/boot/grub
 	@cp $(NAME) iso/boot/
-	@printf 'set timeout=5\nset default=0\n\nmenuentry "$(NAME)" {\n\tmultiboot /boot/$(NAME)\n\tboot\n}\n' > iso/boot/grub/grub.cfg
+	@printf 'set timeout=5\nset default=0\n\nmenuentry "etaquet $(NAME)" {\n\tmultiboot /boot/$(NAME)\n\tboot\n}\n' > iso/boot/grub/grub.cfg
 	@grub-mkrescue -o $(NAME).iso iso
 	@echo "ISO image created: $(NAME).iso"
 
