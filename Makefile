@@ -1,14 +1,14 @@
 NAME	= kfs
-CC	= i686-elf-gcc
-AS	= i686-elf-as
+CC		= gcc
+AS		= gcc
 
 SRCDIR	= src
 INCDIR	= includes
 LDSCRIPT = $(SRCDIR)/linker.ld
 
-CPPFLAGS = -I$(INCDIR)
-CFLAGS	= -std=gnu99 -ffreestanding -fno-builtin -fno-stack-protector -nostdlib -Wall -Wextra
-LDFLAGS	= -ffreestanding -nostdlib -nodefaultlibs -lgcc
+CFLAGS	= -m32 -std=gnu99 -ffreestanding -fno-builtin -fno-stack-protector -nostdlib -Wall -Wextra -I$(INCDIR)
+LDFLAGS	= -m elf_i386
+ASFLAGS	= -m32 -c
 
 SRCS_C	= $(SRCDIR)/kernel.c $(SRCDIR)/terminal.c $(SRCDIR)/keyboard.c $(SRCDIR)/printk.c $(SRCDIR)/bash.c $(SRCDIR)/helpers.c
 SRCS_S	= $(SRCDIR)/boot.s
@@ -20,18 +20,18 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@echo "Linking $(NAME)..."
-	@$(CC) -T $(LDSCRIPT) -o $(NAME) $(LDFLAGS) $(OBJS)
+	@ld -T $(LDSCRIPT) -o $(NAME) $(LDFLAGS) $(OBJS)
 	@echo "Compilation finished. Output: $(NAME)"
 
 $(OBJDIR)/%.o: %.c
 	@echo "\tCC $<"
 	@mkdir -p $(dir $@)
-	@$(CC) $(CPPFLAGS) $(CFLAGS) -MMD -MP -c $< -o $@
+	@$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
 
 $(OBJDIR)/%.o: %.s
 	@echo "\tAS $<"
 	@mkdir -p $(dir $@)
-	@$(AS) $< -o $@
+	@$(AS) $(ASFLAGS) $< -o $@
 
 -include $(DEPS)
 
