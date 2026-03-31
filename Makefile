@@ -1,6 +1,6 @@
 NAME	= kfs
 CC		= gcc
-AS		= gcc
+AS		= nasm
 
 SRCDIR	= src
 INCDIR	= includes
@@ -8,7 +8,7 @@ LDSCRIPT = $(SRCDIR)/linker.ld
 
 CFLAGS	= -m32 -std=gnu99 -ffreestanding -fno-builtin -fno-stack-protector -nostdlib -Wall -Wextra -I$(INCDIR)
 LDFLAGS	= -m elf_i386
-ASFLAGS	= -m32 -c
+ASFLAGS	= -f elf32
 
 SRCS_C	= $(SRCDIR)/kernel.c $(SRCDIR)/terminal.c $(SRCDIR)/keyboard.c $(SRCDIR)/printk.c $(SRCDIR)/bash.c $(SRCDIR)/helpers.c
 SRCS_S	= $(SRCDIR)/boot.s
