@@ -1,8 +1,43 @@
 #include "../includes/kernel.h"
 
 struct idt_entry idt[IDT_SIZE];
+static multiboot_info_t *g_mbi = 0;
 
-static void kernel_halt_forever(void)
+void kernel_set_multiboot_info(multiboot_info_t *mbi)
+{
+	g_mbi = mbi;
+}
+
+void kernel_print_multiboot_flags(void)
+{
+	int i;
+
+	if (!g_mbi)
+	{
+		printk("KERNEL", "multiboot info not available\n");
+		return;
+	}
+	i = 0;
+	while (i <= 12)
+	{
+		int is_set = (g_mbi->flags >> i) & 1;
+		printk("KERNEL", "flag[%d] = ", i);
+		if (is_set)
+		{
+			terminal_setcolor(VGA_COLOR_GREEN);
+			kprintf("1\n");
+		}
+		else
+		{
+			terminal_setcolor(VGA_COLOR_RED);
+			kprintf("0\n");
+		}
+		terminal_setcolor(VGA_COLOR_LIGHT_GREY);
+		i++;
+	}
+}
+
+void kernel_halt_forever(void)
 {
 	for (;;)
 		__asm__ volatile ("hlt");
@@ -108,13 +143,26 @@ void pic_init(void)
 
 	// Mask all IRQs except IRQ1 (keyboard)
 	outb(0x21, 0xFD);  // 11111101 - only IRQ1 unmasked
+	io_wait();
 	outb(0xA1, 0xFF);  // all slave IRQs masked
+	io_wait();
 }
 
-void kernel_main(void)
+void kernel_main(uint32_t magic, multiboot_info_t *mbi)
 {
 	/* Initialize terminal interface */
 	terminal_initialize();
+
+	if (magic != MULTIBOOT_MAGIC)
+	{
+		terminal_set_execute_on_newline(false);
+		printk("KERNEL", "Invalid magic number: 0x%x\n", magic);
+		kprintf(TERMINAL_PROMPT_TEXT);
+		terminal_set_execute_on_newline(true);
+		kernel_halt_forever();
+	}
+
+	kernel_set_multiboot_info(mbi);
 
 	/* Set up the IDT and PIC, then enable interrupts. */
 	idt_init();
@@ -123,7 +171,6 @@ void kernel_main(void)
 	__asm__ volatile ("sti");
 
 	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
-
 	/* Main loop: wait for keyboard input and print it to the terminal. */
 	while (1)
 		__asm__ volatile ("hlt");

@@ -44,6 +44,15 @@ _start:
     ; Clear direction flag (required by System V ABI).
     cld
 
+    ; Must contain the 32-bit physical address of the Multiboot information structure provided by the boot loader.
+    ; This address is only valid after the boot loader has transferred control to the operating system, and is not valid before then.
+    push ebx        ; arg2: multiboot info pointer
+
+    ; Must contain the magic value ‘0x2BADB002’;
+    ; the presence of this value indicates to the operating system that it was loaded by a Multiboot-compliant boot loader
+    ; (e.g. as opposed to another type of boot loader that the operating system can also be loaded from).
+    push eax        ; arg1: magic number
+
     ; Copy GDT + descriptor to the required physical address 0x00000800.
     mov esi, gdt_blob_start
     mov edi, GDT_BASE

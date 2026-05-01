@@ -8,6 +8,8 @@ int execute_command(const char* command)
 
 	if (!command)
 		return 1;
+	if (ft_strcmp(command, "\n") == 0)
+		return 0;
 	ft_strlcpy(line, command, sizeof(line));
 	argc = split_words(line, argv, 8);
 	if (argc == 0)
@@ -15,12 +17,14 @@ int execute_command(const char* command)
 
 	if (ft_strcmp(argv[0], "help") == 0)
 	{
-		terminal_writestring("help - A help message to show you each commands available\n");
-		terminal_writestring("clear - Clear the terminal screen\n");
-		terminal_writestring("echo - Print the arguments passed to it\n");
-		terminal_writestring("dump - Dump the kernel stack (usage: dump [number])\n");
-		terminal_writestring("shutdown - Power off the machine\n");
-		terminal_writestring("reboot - Restart the machine\n");
+		terminal_writestring("help\t -\tA help message to show you each commands available\n");
+		terminal_writestring("clear\t -\tClear the terminal screen\n");
+		terminal_writestring("echo\t -\tPrint the arguments passed to it\n");
+		terminal_writestring("flags\t -\tPrint multiboot flags\n");
+		terminal_writestring("dump\t -\tDump the kernel stack (usage: dump [number])\n");
+		terminal_writestring("shutdown -\tPower off the machine\n");
+		terminal_writestring("reboot\t -\tRestart the machine\n");
+		terminal_writestring("halt\t -\tHalt the machine\n");
 		return 0;
 	}
 
@@ -69,6 +73,18 @@ int execute_command(const char* command)
 		else
 			dump_kernel_stack(8);
 		return 0;
+	}
+
+	if (ft_strcmp(argv[0], "flags") == 0)
+	{
+		kernel_print_multiboot_flags();
+		return 0;
+	}
+
+	if (ft_strcmp(argv[0], "halt") == 0)
+	{
+		kprintf("Halting forever and ever...\n");
+		kernel_halt_forever();
 	}
 
 	if (ft_strcmp(argv[0], "^C") == 0)

@@ -19,7 +19,7 @@ DEPS	= $(OBJS:.o=.d)
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	@echo "Linking $(NAME)..."
+	@echo "\tLD $@"
 	@ld -T $(LDSCRIPT) -o $(NAME) $(LDFLAGS) $(OBJS)
 	@echo "Compilation finished. Output: $(NAME)"
 
@@ -54,11 +54,14 @@ iso: re
 	@mkdir -p iso/boot/grub
 	@cp $(NAME) iso/boot/
 	@printf 'set timeout=5\nset default=0\n\nmenuentry "etaquet $(NAME)" {\n\tmultiboot /boot/$(NAME)\n\tboot\n}\n' > iso/boot/grub/grub.cfg
-	@grub-mkrescue -o $(NAME).iso iso
+	@grub-mkrescue --compress=gz -o $(NAME).iso iso
 	@echo "ISO image created: $(NAME).iso"
 
-launch: iso
+run: iso
 	@echo "Launching QEMU..."
 	@qemu-system-i386 -cdrom $(NAME).iso
 
-.PHONY: all re clean fclean iso launch
+dev: iso
+	@qemu-system-i386 -drive format=raw,file=$(NAME).iso -s -S
+
+.PHONY: all re clean fclean iso run dev

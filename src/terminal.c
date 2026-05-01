@@ -1,27 +1,42 @@
 #include "../includes/kernel.h"
 
 static volatile uint16_t* const vga_buffer = (uint16_t*)VGA_MEMORY;
-
-struct terminal_screen {
-	uint16_t cells[VGA_HEIGHT * VGA_WIDTH];
-	bool is_tab_space[VGA_HEIGHT][VGA_WIDTH];
-	bool is_cell_occupied[VGA_HEIGHT][VGA_WIDTH];
-	uint8_t locked_prefix_col[VGA_HEIGHT];
-	size_t row;
-	size_t column;
-	size_t preferred_column;
-	uint8_t color;
-};
-
 static struct terminal_screen screens[TERMINAL_SCREEN_COUNT];
 static size_t active_screen;
 static struct terminal_screen* terminal_current_screen(void);
 static bool execute_on_newline = true;
 static int terminal_row_last_filled_col(size_t row);
+static void terminal_reset_line(size_t row);
+
+void terminal_set_execute_on_newline(bool enabled)
+{
+	struct terminal_screen* screen = terminal_current_screen();
+	
+	if (!enabled)
+	{
+		terminal_reset_line(TERMINAL_PROMPT_ROW);
+		screen->row = TERMINAL_PROMPT_ROW;
+		screen->column = 0;
+	}
+	execute_on_newline = enabled;
+}
 
 static size_t terminal_locked_prefix_col(size_t row)
 {
 	return terminal_current_screen()->locked_prefix_col[row];
+}
+
+static void terminal_reset_line(size_t row)
+{
+	struct terminal_screen* screen = terminal_current_screen();
+
+	for (size_t x = 0; x < VGA_WIDTH; x++)
+	{
+		screen->cells[row * VGA_WIDTH + x] = vga_entry(' ', screen->color);
+		screen->is_tab_space[row][x] = false;
+		screen->is_cell_occupied[row][x] = false;
+	}
+	screen->locked_prefix_col[row] = 0;
 }
 
 static void terminal_collect_current_command(char* out, size_t out_size)

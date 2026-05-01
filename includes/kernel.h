@@ -4,38 +4,7 @@
 # include "va_arg.h"
 # include "define.h"
 # include "helpers.h"
-
-struct idt_entry {
-	uint16_t offset_low;
-	uint16_t selector;
-	uint8_t  zero;
-	uint8_t  type_attr;
-	uint16_t offset_high;
-} __attribute__((packed));
-
-struct idt_ptr {
-	uint16_t limit;
-	uint32_t base;
-} __attribute__((packed));
-
-enum vga_color {
-	VGA_COLOR_BLACK = 0,
-	VGA_COLOR_BLUE = 1,
-	VGA_COLOR_GREEN = 2,
-	VGA_COLOR_CYAN = 3,
-	VGA_COLOR_RED = 4,
-	VGA_COLOR_MAGENTA = 5,
-	VGA_COLOR_BROWN = 6,
-	VGA_COLOR_LIGHT_GREY = 7,
-	VGA_COLOR_DARK_GREY = 8,
-	VGA_COLOR_LIGHT_BLUE = 9,
-	VGA_COLOR_LIGHT_GREEN = 10,
-	VGA_COLOR_LIGHT_CYAN = 11,
-	VGA_COLOR_LIGHT_RED = 12,
-	VGA_COLOR_LIGHT_MAGENTA = 13,
-	VGA_COLOR_LIGHT_BROWN = 14,
-	VGA_COLOR_WHITE = 15,
-};
+# include "structs.h"
 
 static const char scancode_map[128] = {
 	0,   0,  '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
@@ -123,7 +92,11 @@ int execute_command(const char* command);
 void terminal_clear(void);
 void terminal_reset_session(void);
 void terminal_newline_with_prompt(void);
+void terminal_set_execute_on_newline(bool enabled);
 void kernel_shutdown(void);
 void kernel_reboot(void);
+void kernel_halt_forever(void);
+void kernel_set_multiboot_info(multiboot_info_t *mbi);
+void kernel_print_multiboot_flags(void);
 
 #endif
