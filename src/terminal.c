@@ -14,8 +14,7 @@ void terminal_set_execute_on_newline(bool enabled)
 	
 	if (!enabled)
 	{
-		terminal_reset_line(TERMINAL_PROMPT_ROW);
-		screen->row = TERMINAL_PROMPT_ROW;
+		terminal_reset_line(screen->row);
 		screen->column = 0;
 	}
 	execute_on_newline = enabled;

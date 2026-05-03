@@ -148,6 +148,30 @@ void pic_init(void)
 	io_wait();
 }
 
+uint32_t read_cr0(void)
+{
+	uint32_t cr0;
+	__asm__ volatile ("mov %%cr0, %0" : "=r"(cr0));
+	return cr0;
+}
+
+uint32_t read_cr2(void)
+{
+    uint32_t cr2;
+    __asm__ volatile ("mov %%cr2, %0" : "=r"(cr2));
+    return cr2;
+}
+
+void page_fault_handler(uint32_t error_code)
+{
+	terminal_set_execute_on_newline(false);
+    printk("PAGE FAULT", "error code = 0x%x\n", error_code);
+	printk("PAGE FAULT", "addr = 0x%x\n", read_cr2());
+	kprintf(TERMINAL_PROMPT_TEXT);
+	terminal_set_execute_on_newline(true);
+    kernel_halt_forever();
+}
+
 void kernel_main(uint32_t magic, multiboot_info_t *mbi)
 {
 	/* Initialize terminal interface */
@@ -167,6 +191,8 @@ void kernel_main(uint32_t magic, multiboot_info_t *mbi)
 
 	pfa_init(mbi);
 
+	paging_init();
+
 	show_free_frames();
 	void *a = pfa_alloc_frame();
 	void *b = pfa_alloc_frame();
@@ -176,11 +202,20 @@ void kernel_main(uint32_t magic, multiboot_info_t *mbi)
 	void *d = pfa_alloc_frame();
 	printk("PFA", "after free b, alloc d: 0x%x (should == b)\n", d);
 	show_free_frames();
+	uint32_t cr0 = read_cr0();
+
+	printk("PAGING", "CR0 = 0x%x\n", cr0);
+
+	if (cr0 & (1 << 31))
+		printk("PAGING", "Paging ENABLED\n");
+	else
+		printk("PAGING", "Paging DISABLED\n");
 
 	/* Set up the IDT and PIC, then enable interrupts. */
 	idt_init();
 	pic_init();
 	idt_set_gate(33, (uintptr_t)keyboard_handler_stub, 0x08, 0x8E);
+	idt_set_gate(14, (uintptr_t)page_fault_handler_stub, 0x08, 0x8E);
 	__asm__ volatile ("sti");
 
 	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));

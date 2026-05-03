@@ -119,5 +119,7 @@ typedef struct {
     uint32_t base;    // adresse de la GDT
 } __attribute__((packed)) gdtr_t;
 
+typedef uint32_t pde_t;   // Page Directory Entry
+typedef uint32_t pte_t;   // Page Table Entry
 
 #endif // STRUCTS_H

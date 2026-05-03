@@ -69,6 +69,8 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color)
 
 void load_idt(struct idt_ptr *ptr);
 void keyboard_handler_stub(void);
+void page_fault_handler_stub(void);
+void page_fault_handler(uint32_t error_code);
 void keyboard_handler(void);
 void idt_set_gate(uint8_t num, uint32_t handler_address, 
 				  uint16_t selector, uint8_t type_attr);
@@ -105,5 +107,6 @@ void *pfa_alloc_frame(void);
 void pfa_free_frame(void *frame);
 void show_free_frames(void);
 void gdt_init(void);
+void paging_init();
 
 #endif

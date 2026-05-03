@@ -7,10 +7,12 @@ MB_CHECKSUM equ -(MB_MAGIC + MB_FLAGS)    ; checksum of above, to prove we are m
 
 extern kernel_main
 extern keyboard_handler
+extern page_fault_handler
 
 global _start
 global load_idt
 global keyboard_handler_stub
+global page_fault_handler_stub
 
 ;
 ; Declare a multiboot header that marks the program as a kernel.
@@ -65,4 +67,20 @@ keyboard_handler_stub:
     pusha
     call keyboard_handler
     popa
+    iretd
+
+page_fault_handler_stub:
+    pusha
+
+    mov eax, [esp + 32]   ; récupérer error_code
+                          ; 32 = 8 regs * 4 bytes (pusha)
+
+    push eax              ; argument pour C
+    call page_fault_handler
+    add esp, 4            ; clean argument
+
+    popa
+
+    add esp, 4            ; enlever error_code de la stack
+
     iretd

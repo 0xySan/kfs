@@ -71,4 +71,10 @@ enum vga_color {
 	VGA_COLOR_WHITE = 15,
 };
 
+#define MAKE_ENTRY(addr, flags)  ((addr) | (flags))
+
+#define PAGE_PRESENT    (1 << 0)
+#define PAGE_RW         (1 << 1)
+#define PAGE_USER       (1 << 2)
+
 #endif // DEFINE_H
