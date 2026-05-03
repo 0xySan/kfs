@@ -17,24 +17,27 @@ static void pfa_set_bit(uint32_t frame_index)
 
 void *pfa_alloc_frame(void)
 {
-    for (uint32_t i = 0; i < bitmap_size; i++)
-    {
-        if (bitmap[i] == 0xFFFFFFFF)
-            continue; // no free frame in this uint32_t, skip
-        for (uint32_t j = 0; j < 32; j++)
-        {
-            if (!(bitmap[i] & (1 << j)))
-            {
-                pfa_set_bit(i * 32 + j);
-                return (void *)(uintptr_t)(mem_start + (i * 32 + j) * PAGE_SIZE);
-            }
-        }
-    }
-    return (void *)0; // out of memory
+	for (uint32_t i = 0; i < bitmap_size; i++)
+	{
+		if (bitmap[i] == 0xFFFFFFFF)
+			continue; // no free frame in this uint32_t, skip
+		for (uint32_t j = 0; j < 32; j++)
+		{
+			if (!(bitmap[i] & (1 << j)))
+			{
+				pfa_set_bit(i * 32 + j);
+				return (void *)(uintptr_t)(mem_start + (i * 32 + j) * PAGE_SIZE);
+			}
+		}
+	}
+	return (void *)0; // out of memory
 }
 
 void pfa_free_frame(void *frame)
 {
+	if ((uintptr_t)frame < mem_start) return;
+	if ((uintptr_t)frame % PAGE_SIZE != 0) return;
+
 	uint32_t frame_index = ((uintptr_t)frame - mem_start) / PAGE_SIZE;
 	pfa_clear_bit(frame_index);
 }
