@@ -45,10 +45,7 @@ void pfa_free_frame(void *frame)
 void pfa_init(multiboot_info_t *mbi)
 {
 	if (!(mbi->flags & (1 << 6)))
-	{
-		printk("PFA", "no mmap from bootloader\n");
-		return;
-	}
+		kpanic("Memory map not provided by multiboot");
 
 	multiboot_mmap_entry_t *entry = (multiboot_mmap_entry_t *)(uintptr_t)mbi->mmap_addr;
 	while ((uintptr_t)entry < mbi->mmap_addr + mbi->mmap_length)
@@ -86,6 +83,17 @@ void pfa_init(multiboot_info_t *mbi)
 
 	for (uint32_t i = bitmap_start_frame; i < bitmap_end_frame; i++)
 		pfa_set_bit(i);
+}
+
+void pfa_mark_used(uintptr_t start, size_t size)
+{
+	if (start < mem_start) return;
+
+	uint32_t first_frame = (start - mem_start) / PAGE_SIZE;
+	uint32_t frame_count = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+
+	for (uint32_t i = 0; i < frame_count; i++)
+		pfa_set_bit(first_frame + i);
 }
 
 void show_free_frames()

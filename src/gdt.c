@@ -10,8 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/define.h"
-#include "../includes/structs.h"
+#include "../includes/kernel.h"
 
 void gdt_flush(void)
 {

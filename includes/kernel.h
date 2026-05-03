@@ -5,6 +5,8 @@
 # include "define.h"
 # include "helpers.h"
 # include "structs.h"
+# include "functions.h"
+# include "inline.h"
 
 static const char scancode_map[128] = {
 	0,   0,  '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
@@ -24,89 +26,9 @@ static const char shift_scancode_map[128] = {
 	0, 0, 0, 0, 0, 0, 0, 0
 };
 
+extern pde_t pd[1024];
+extern pte_t pt[1024];
+
 extern uint32_t kernel_end;
-
-static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg)
-{
-	return fg | bg << 4;
-}
-
-static inline void outb(uint16_t port, uint8_t value)
-{
-	__asm__ volatile ("outb %0, %1"
-		:
-		: "a"(value), "Nd"(port)
-	);
-}
-
-static inline void outw(uint16_t port, uint16_t value)
-{
-	__asm__ volatile ("outw %0, %1"
-		:
-		: "a"(value), "Nd"(port)
-	);
-}
-
-static inline uint8_t inb(uint16_t port)
-{
-	uint8_t value;
-	__asm__ volatile ("inb %1, %0"
-		: "=a"(value)
-		: "Nd"(port)
-	);
-	return value;
-}
-
-static inline void io_wait(void)
-{
-	outb(0x80, 0);
-}
-
-static inline uint16_t vga_entry(unsigned char uc, uint8_t color)
-{
-	return (uint16_t) uc | (uint16_t) color << 8;
-}
-
-void load_idt(struct idt_ptr *ptr);
-void keyboard_handler_stub(void);
-void page_fault_handler_stub(void);
-void page_fault_handler(uint32_t error_code);
-void keyboard_handler(void);
-void idt_set_gate(uint8_t num, uint32_t handler_address, 
-				  uint16_t selector, uint8_t type_attr);
-void idt_init(void);
-void pic_init(void);
-void terminal_initialize(void);
-void terminal_setcolor(uint8_t color);
-void terminal_setrow(size_t row);
-void terminal_setcolumn(size_t column);
-void terminal_putchar(char c);
-void terminal_write(const char* data, size_t size);
-void terminal_writestring(const char* data);
-void terminal_putentryat(char c, uint8_t color, size_t x, size_t y);
-void handle_backspace(void);
-char scancode_to_ascii(uint8_t scancode);
-int kprintf(const char *format, ...);
-int printk(const char *level, const char *format, ...);
-void dump_kernel_stack(size_t words);
-void handle_arrow_keys(uint8_t arrow_key);
-void terminal_switch_screen(size_t screen_index);
-size_t terminal_get_active_screen(void);
-int execute_command(const char* command);
-void terminal_clear(void);
-void terminal_reset_session(void);
-void terminal_newline_with_prompt(void);
-void terminal_set_execute_on_newline(bool enabled);
-void kernel_shutdown(void);
-void kernel_reboot(void);
-void kernel_halt_forever(void);
-void kernel_set_multiboot_info(multiboot_info_t *mbi);
-void kernel_print_multiboot_flags(void);
-void pfa_init(multiboot_info_t *mbi);
-void *pfa_alloc_frame(void);
-void pfa_free_frame(void *frame);
-void show_free_frames(void);
-void gdt_init(void);
-void paging_init();
 
 #endif

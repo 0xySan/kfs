@@ -123,6 +123,7 @@ int printk(const char *level, const char *format, ...)
 	int		written;
 
 	written = 0;
+	terminal_set_execute_on_newline(false);
 	if (level)
 	{
 		put_char_count('[', &written);
@@ -132,5 +133,7 @@ int printk(const char *level, const char *format, ...)
 	va_start(args, format);
 	written += vkprintf(format, args);
 	va_end(args);
+	put_string_count(TERMINAL_PROMPT_TEXT, &written);
+	terminal_set_execute_on_newline(true);
 	return written;
 }

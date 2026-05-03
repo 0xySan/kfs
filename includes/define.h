@@ -77,4 +77,11 @@ enum vga_color {
 #define PAGE_RW         (1 << 1)
 #define PAGE_USER       (1 << 2)
 
+#define USER_SPACE_START    0x00000000
+#define USER_SPACE_END      0xBFFFFFFF
+#define KERNEL_SPACE_START  0xC0000000
+#define KERNEL_SPACE_END    0xFFFFFFFF
+// 0x00000000 - 0xBFFFFFFF  → user space   (3 GB)
+// 0xC0000000 - 0xFFFFFFFF  → kernel space (1 GB)
+
 #endif // DEFINE_H

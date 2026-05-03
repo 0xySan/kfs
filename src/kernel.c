@@ -164,12 +164,8 @@ uint32_t read_cr2(void)
 
 void page_fault_handler(uint32_t error_code)
 {
-	terminal_set_execute_on_newline(false);
-    printk("PAGE FAULT", "error code = 0x%x\n", error_code);
-	printk("PAGE FAULT", "addr = 0x%x\n", read_cr2());
-	kprintf(TERMINAL_PROMPT_TEXT);
-	terminal_set_execute_on_newline(true);
-    kernel_halt_forever();
+	printk("PAGE FAULT", "Page fault at address 0x%x, error code 0x%x\n", read_cr2(), error_code);
+	kpanic("Page fault");
 }
 
 void kernel_main(uint32_t magic, multiboot_info_t *mbi)
@@ -179,37 +175,41 @@ void kernel_main(uint32_t magic, multiboot_info_t *mbi)
 	terminal_initialize();
 
 	if (magic != MULTIBOOT_MAGIC)
-	{
-		terminal_set_execute_on_newline(false);
-		printk("KERNEL", "Invalid magic number: 0x%x\n", magic);
-		kprintf(TERMINAL_PROMPT_TEXT);
-		terminal_set_execute_on_newline(true);
-		kernel_halt_forever();
-	}
+		kpanic("Invalid multiboot magic number");
 
 	kernel_set_multiboot_info(mbi);
 
 	pfa_init(mbi);
 
+	// mark pd and pt frames as used in the PFA
+	pfa_mark_used((uintptr_t)pd, sizeof(pd));
+	pfa_mark_used((uintptr_t)pt, sizeof(pt));
+
 	paging_init();
 
-	show_free_frames();
-	void *a = pfa_alloc_frame();
-	void *b = pfa_alloc_frame();
-	void *c = pfa_alloc_frame();
-	printk("PFA", "alloc: 0x%x 0x%x 0x%x\n", a, b, c);
-	pfa_free_frame(b);
-	void *d = pfa_alloc_frame();
-	printk("PFA", "after free b, alloc d: 0x%x (should == b)\n", d);
-	show_free_frames();
-	uint32_t cr0 = read_cr0();
+	// show_free_frames();
+	// void *a = pfa_alloc_frame();
+	// void *b = pfa_alloc_frame();
+	// void *c = pfa_alloc_frame();
+	// printk("PFA", "alloc: 0x%x 0x%x 0x%x\n", a, b, c);
+	// pfa_free_frame(b);
+	// void *d = pfa_alloc_frame();
+	// printk("PFA", "after free b, alloc d: 0x%x (should == b)\n", d);
+	// show_free_frames();
+	// uint32_t cr0 = read_cr0();
 
-	printk("PAGING", "CR0 = 0x%x\n", cr0);
+	// printk("PAGING", "CR0 = 0x%x\n", cr0);
 
-	if (cr0 & (1 << 31))
-		printk("PAGING", "Paging ENABLED\n");
-	else
-		printk("PAGING", "Paging DISABLED\n");
+	// if (cr0 & (1 << 31))
+	// 	printk("PAGING", "Paging ENABLED\n");
+	// else
+	// 	printk("PAGING", "Paging DISABLED\n");
+
+	void *frame = pfa_alloc_frame();
+	vmm_map_page(0xD0000000, (uintptr_t)frame, PAGE_PRESENT | PAGE_RW);
+	printk("VMM", "mapped 0xD0000000 -> 0x%x\n", vmm_get_physical(0xD0000000));
+	vmm_unmap_page(0xD0000000);
+	printk("VMM", "after unmap: 0x%x (should be 0)\n", vmm_get_physical(0xD0000000));
 
 	/* Set up the IDT and PIC, then enable interrupts. */
 	idt_init();

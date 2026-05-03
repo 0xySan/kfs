@@ -6,4 +6,6 @@ FILES	=	kernel \
 			helpers \
 			pfa \
 			gdt \
-			paging
+			paging \
+			vmm \
+			panic
