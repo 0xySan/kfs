@@ -24,6 +24,8 @@ static const char shift_scancode_map[128] = {
 	0, 0, 0, 0, 0, 0, 0, 0
 };
 
+extern uint32_t kernel_end;
+
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg)
 {
 	return fg | bg << 4;
@@ -98,5 +100,9 @@ void kernel_reboot(void);
 void kernel_halt_forever(void);
 void kernel_set_multiboot_info(multiboot_info_t *mbi);
 void kernel_print_multiboot_flags(void);
+void pfa_init(multiboot_info_t *mbi);
+void *pfa_alloc_frame(void);
+void pfa_free_frame(void *frame);
+void show_free_frames(void);
 
 #endif

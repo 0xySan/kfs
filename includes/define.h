@@ -2,6 +2,7 @@
 #define DEFINE_H
 
 # define IDT_SIZE	256
+# define MAX_MMAP_ENTRIES 64
 # define VGA_WIDTH	80
 # define VGA_HEIGHT	25
 # define VGA_MEMORY	0xB8000
@@ -47,6 +48,9 @@ typedef __builtin_va_list va_list;
 /* Define _Bool as a GNU extension. */
 # define _Bool bool
 #endif
+
+#define PAGE_SIZE 4096
+#define ALIGN_UP(addr) (((addr) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
 enum vga_color {
 	VGA_COLOR_BLACK = 0,

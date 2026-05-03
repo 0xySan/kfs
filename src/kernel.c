@@ -164,6 +164,18 @@ void kernel_main(uint32_t magic, multiboot_info_t *mbi)
 
 	kernel_set_multiboot_info(mbi);
 
+	pfa_init(mbi);
+
+	show_free_frames();
+	void *a = pfa_alloc_frame();
+	void *b = pfa_alloc_frame();
+	void *c = pfa_alloc_frame();
+	printk("PFA", "alloc: 0x%x 0x%x 0x%x\n", a, b, c);
+	pfa_free_frame(b);
+	void *d = pfa_alloc_frame();
+	printk("PFA", "after free b, alloc d: 0x%x (should == b)\n", d);
+	show_free_frames();
+
 	/* Set up the IDT and PIC, then enable interrupts. */
 	idt_init();
 	pic_init();
