@@ -105,4 +105,19 @@ typedef struct {
 	uint32_t type;		// 1 = available RAM, anything else = reserved
 } __attribute__((packed)) multiboot_mmap_entry_t;
 
+typedef struct {
+    uint16_t limit_low;    // bits 0-15 de la limite
+    uint16_t base_low;     // bits 0-15 de la base
+    uint8_t  base_mid;     // bits 16-23 de la base
+    uint8_t  access;       // droits d'accès (le plus important)
+    uint8_t  granularity;  // flags + bits 16-19 de la limite
+    uint8_t  base_high;    // bits 24-31 de la base
+} __attribute__((packed)) gdt_entry_t;
+
+typedef struct {
+    uint16_t limit;   // taille totale de la GDT - 1
+    uint32_t base;    // adresse de la GDT
+} __attribute__((packed)) gdtr_t;
+
+
 #endif // STRUCTS_H

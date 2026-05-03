@@ -104,5 +104,6 @@ void pfa_init(multiboot_info_t *mbi);
 void *pfa_alloc_frame(void);
 void pfa_free_frame(void *frame);
 void show_free_frames(void);
+void gdt_init(void);
 
 #endif

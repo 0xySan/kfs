@@ -151,6 +151,7 @@ void pic_init(void)
 void kernel_main(uint32_t magic, multiboot_info_t *mbi)
 {
 	/* Initialize terminal interface */
+	gdt_init();
 	terminal_initialize();
 
 	if (magic != MULTIBOOT_MAGIC)
@@ -184,6 +185,5 @@ void kernel_main(uint32_t magic, multiboot_info_t *mbi)
 
 	terminal_setcolor(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
 	/* Main loop: wait for keyboard input and print it to the terminal. */
-	while (1)
-		__asm__ volatile ("hlt");
+	for (;;) {}
 }

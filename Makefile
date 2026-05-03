@@ -11,7 +11,7 @@ LDFLAGS	= -m elf_i386
 ASFLAGS	= -f elf32
 # GRUBFLAGS = --compress=gz
 
-SRCS_C	= $(SRCDIR)/kernel.c $(SRCDIR)/terminal.c $(SRCDIR)/keyboard.c $(SRCDIR)/printk.c $(SRCDIR)/bash.c $(SRCDIR)/helpers.c $(SRCDIR)/pfa.c
+SRCS_C	= $(SRCDIR)/kernel.c $(SRCDIR)/terminal.c $(SRCDIR)/keyboard.c $(SRCDIR)/printk.c $(SRCDIR)/bash.c $(SRCDIR)/helpers.c $(SRCDIR)/pfa.c $(SRCDIR)/gdt.c
 SRCS_S	= $(SRCDIR)/boot.s
 OBJDIR	= obj
 OBJS	= $(addprefix $(OBJDIR)/,$(SRCS_S:.s=.o) $(SRCS_C:.c=.o))
