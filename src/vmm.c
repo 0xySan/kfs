@@ -1,5 +1,7 @@
 #include "../includes/kernel.h"
 
+// VMM (Virtual Memory Manager) - manages virtual addresses, maps them to physical frames using the page tables
+
 /* Maps the given physical address to the given virtual address with the specified flags.
    If the page table for the virtual address doesn't exist, it will be created. */
 void vmm_map_page(uintptr_t virt, uintptr_t phys, uint32_t flags)

@@ -5,6 +5,8 @@ static uint32_t  bitmap_size;  // number of uint32_t entries
 static uint32_t  mem_start;    // first managed frame address
 static uint32_t  total_frames; // total frames being tracked
 
+// PFA (Physical Frame Allocator) - manages physical RAM, hands out 4KB frames
+
 static void pfa_clear_bit(uint32_t frame_index)
 {
 	bitmap[frame_index / 32] &= ~(1 << (frame_index % 32));
