@@ -4,38 +4,16 @@ static volatile uint16_t* const vga_buffer = (uint16_t*)VGA_MEMORY;
 static struct terminal_screen screens[TERMINAL_SCREEN_COUNT];
 static size_t active_screen;
 static struct terminal_screen* terminal_current_screen(void);
-static bool execute_on_newline = true;
 static int terminal_row_last_filled_col(size_t row);
-static void terminal_reset_line(size_t row);
-
-void terminal_set_execute_on_newline(bool enabled)
-{
-	struct terminal_screen* screen = terminal_current_screen();
-	
-	if (!enabled)
-	{
-		terminal_reset_line(screen->row);
-		screen->column = 0;
-	}
-	execute_on_newline = enabled;
-}
+static void terminal_scroll_up(void);
+static void terminal_render_char(char c);
+static void terminal_render_newline(void);
+static void terminal_render_backspace(void);
+static void terminal_render_tab(void);
 
 static size_t terminal_locked_prefix_col(size_t row)
 {
 	return terminal_current_screen()->locked_prefix_col[row];
-}
-
-static void terminal_reset_line(size_t row)
-{
-	struct terminal_screen* screen = terminal_current_screen();
-
-	for (size_t x = 0; x < VGA_WIDTH; x++)
-	{
-		screen->cells[row * VGA_WIDTH + x] = vga_entry(' ', screen->color);
-		screen->is_tab_space[row][x] = false;
-		screen->is_cell_occupied[row][x] = false;
-	}
-	screen->locked_prefix_col[row] = 0;
 }
 
 static void terminal_collect_current_command(char* out, size_t out_size)
@@ -76,6 +54,72 @@ static struct terminal_screen* terminal_current_screen(void)
 }
 
 static void terminal_insert_char(char c);
+
+static void terminal_render_char(char c)
+{
+	struct terminal_screen* screen = terminal_current_screen();
+
+	if (screen->row < TERMINAL_CONTENT_START_ROW)
+		screen->row = TERMINAL_CONTENT_START_ROW;
+	size_t index = screen->row * VGA_WIDTH + screen->column;
+
+	screen->cells[index] = vga_entry(c, screen->color);
+	if (++screen->column == VGA_WIDTH)
+	{
+		screen->column = 0;
+		if (++screen->row == VGA_HEIGHT)
+		{
+			terminal_scroll_up();
+			screen->row = VGA_HEIGHT - 1;
+		}
+	}
+}
+
+static void terminal_render_newline(void)
+{
+	struct terminal_screen* screen = terminal_current_screen();
+
+	if (screen->row < TERMINAL_CONTENT_START_ROW)
+		screen->row = TERMINAL_CONTENT_START_ROW;
+
+	screen->column = 0;
+	if (++screen->row == VGA_HEIGHT)
+	{
+		terminal_scroll_up();
+		screen->row = VGA_HEIGHT - 1;
+	}
+}
+
+static void terminal_render_tab(void)
+{
+	struct terminal_screen* screen = terminal_current_screen();
+	size_t tab_width = TAB_WIDTH - (screen->column % TAB_WIDTH);
+
+	for (size_t i = 0; i < tab_width; i++)
+		terminal_render_char(' ');
+}
+
+static void terminal_render_backspace(void)
+{
+	struct terminal_screen* screen = terminal_current_screen();
+
+	if (screen->row < TERMINAL_CONTENT_START_ROW)
+	{
+		screen->row = TERMINAL_CONTENT_START_ROW;
+		return;
+	}
+
+	if (screen->column == 0)
+	{
+		if (screen->row <= TERMINAL_CONTENT_START_ROW)
+			return;
+		screen->row--;
+		screen->column = VGA_WIDTH - 1;
+	}
+	else
+		screen->column--;
+	screen->cells[screen->row * VGA_WIDTH + screen->column] = vga_entry(' ', screen->color);
+}
 
 static void terminal_write_text_for_screen(size_t screen_id, size_t row,
 		size_t col, const char* text, uint8_t color)
@@ -219,8 +263,7 @@ void terminal_newline_with_prompt(void)
 	struct terminal_screen* screen = terminal_current_screen();
 	char command[128];
 
-	if (execute_on_newline)
-		terminal_collect_current_command(command, sizeof(command));
+	terminal_collect_current_command(command, sizeof(command));
 
 	screen->column = 0;
 	if (++screen->row == VGA_HEIGHT)
@@ -230,25 +273,17 @@ void terminal_newline_with_prompt(void)
 	}
 	screen->locked_prefix_col[screen->row] = 0;
 
-	if (execute_on_newline)
+	execute_command(command);
+	if (screen->column != 0)
 	{
-		execute_on_newline = false;
-		execute_command(command);
-		execute_on_newline = true;
-		if (screen->column != 0)
+		screen->column = 0;
+		if (++screen->row == VGA_HEIGHT)
 		{
-			screen->column = 0;
-			if (++screen->row == VGA_HEIGHT)
-			{
-				terminal_scroll_up();
-				screen->row = VGA_HEIGHT - 1;
-			}
-			screen->locked_prefix_col[screen->row] = 0;
+			terminal_scroll_up();
+			screen->row = VGA_HEIGHT - 1;
 		}
+		screen->locked_prefix_col[screen->row] = 0;
 	}
-
-	if (!execute_on_newline)
-		return;
 	screen->locked_prefix_col[screen->row] = (uint8_t)strlen(TERMINAL_PROMPT_TEXT);
 	for (size_t i = 0; TERMINAL_PROMPT_TEXT[i] != '\0'; i++)
 		terminal_insert_char(TERMINAL_PROMPT_TEXT[i]);
@@ -528,7 +563,14 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
 
 void terminal_putchar(char c)
 {
-	terminal_insert_char(c);
+	if (c == '\n')
+		terminal_render_newline();
+	else if (c == '\t')
+		terminal_render_tab();
+	else if (c == '\b')
+		terminal_render_backspace();
+	else
+		terminal_render_char(c);
 	terminal_flush_active_screen();
 	terminal_update_cursor();
 }
@@ -569,6 +611,23 @@ void handle_arrow_keys(uint8_t arrow_key)
 }
 
 void terminal_write(const char* data, size_t size)
+{
+	for (size_t i = 0; i < size; i++)
+	{
+		if (data[i] == '\t')
+			terminal_render_tab();
+		else if (data[i] == '\n')
+			terminal_render_newline();
+		else if (data[i] == '\b')
+			terminal_render_backspace();
+		else
+			terminal_render_char(data[i]);
+	}
+	terminal_flush_active_screen();
+	terminal_update_cursor();
+}
+
+void terminal_write_input(const char* data, size_t size)
 {
 	struct terminal_screen* screen = terminal_current_screen();
 

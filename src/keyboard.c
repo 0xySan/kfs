@@ -56,7 +56,7 @@ void keyboard_handler(void)
 		if (ctrl_held)
 		{
 			if (scancode == 0x2E) // Ctrl + C
-				terminal_write("^C\n", 3);
+				terminal_write_input("^C\n", 3);
 			else if (scancode == 0x20) // Ctrl + D
 				terminal_reset_session();
 		}
@@ -64,7 +64,7 @@ void keyboard_handler(void)
 		{
 			if (caps_lock_on && c >= 'a' && c <= 'z')
 				c -= 32;
-			terminal_write(&c, 1);
+			terminal_write_input(&c, 1);
 		}
 	}
 	outb(0x20, 0x20);

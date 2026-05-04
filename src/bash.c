@@ -15,6 +15,18 @@ int execute_command(const char* command)
 	if (argc == 0)
 		return 0;
 
+	if (ft_strcmp(argv[0], "bash$") == 0)
+	{
+		if (argc > 1)
+		{
+			for (size_t i = 0; i < argc - 1; i++)
+				argv[i] = argv[i + 1];
+			argc--;
+		}
+		else
+			return 0;
+	}
+
 	if (ft_strcmp(argv[0], "help") == 0)
 	{
 		terminal_writestring("help\t -\tA help message to show you each commands available\n");
@@ -38,7 +50,25 @@ int execute_command(const char* command)
 	{
 		for (size_t i = 1; i < argc; i++)
 		{
-			terminal_writestring(argv[i]);
+			for (size_t j = 0; argv[i][j]; j++)
+			{
+				if (argv[i][j] == '\\' && argv[i][j + 1])
+				{
+					j++;
+					if (argv[i][j] == 'n')
+						terminal_putchar('\n');
+					else if (argv[i][j] == 't')
+						terminal_putchar('\t');
+					else if (argv[i][j] == 'b')
+						terminal_putchar('\b');
+					else if (argv[i][j] == '\\')
+						terminal_putchar('\\');
+					else
+						terminal_putchar(argv[i][j]);
+				}
+				else
+					terminal_putchar(argv[i][j]);
+			}
 			if (i + 1 < argc)
 				terminal_putchar(' ');
 		}

@@ -9,7 +9,7 @@ LDSCRIPT = $(SRCDIR)/linker.ld
 CFLAGS	= -m32 -std=gnu99 -ffreestanding -fno-builtin -fno-stack-protector -nostdlib -Wall -Wextra -I$(INCDIR)
 LDFLAGS	= -m elf_i386
 ASFLAGS	= -f elf32
-# GRUBFLAGS = --compress=gz
+GRUBFLAGS = --compress=gz --fonts="" --themes="" --locales=""
 
 include Files.mk
 

@@ -210,6 +210,7 @@ void kernel_main(uint32_t magic, multiboot_info_t *mbi)
 	printk("VMM", "mapped 0xD0000000 -> 0x%x\n", vmm_get_physical(0xD0000000));
 	vmm_unmap_page(0xD0000000);
 	printk("VMM", "after unmap: 0x%x (should be 0)\n", vmm_get_physical(0xD0000000));
+	terminal_writestring(TERMINAL_PROMPT_TEXT);
 
 	/* Set up the IDT and PIC, then enable interrupts. */
 	idt_init();
