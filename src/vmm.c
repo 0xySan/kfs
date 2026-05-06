@@ -20,7 +20,7 @@ void vmm_map_page(uintptr_t virt, uintptr_t phys, uint32_t flags)
 		pd[pd_index] = MAKE_ENTRY(new_pt_addr, PAGE_PRESENT | PAGE_RW | PAGE_USER);
 	}
 
-	pte_t *pt_base = (pte_t *)(uintptr_t)(pd[pd_index] & ~0xFFF);
+	pte_t *pt_base = (pte_t *)(uintptr_t)(pd[pd_index] & ~0xFFF); // Get the base address of the page table removing the flags
 	pt_base[pt_index] = MAKE_ENTRY(phys, flags);
 
 	__asm__ volatile ("invlpg (%0)" : : "r"(virt) : "memory");
@@ -31,31 +31,31 @@ void vmm_map_page(uintptr_t virt, uintptr_t phys, uint32_t flags)
 	The caller is responsible for calling pfa_free_frame() if they want to release the physical memory too.*/
 void vmm_unmap_page(uintptr_t virt)
 {
-    uint32_t pd_index = virt >> 22;
-    uint32_t pt_index = (virt >> 12) & 0x3FF;
+	uint32_t pd_index = virt >> 22;
+	uint32_t pt_index = (virt >> 12) & 0x3FF;
 
-    if (!(pd[pd_index] & PAGE_PRESENT))
-        return;
+	if (!(pd[pd_index] & PAGE_PRESENT))
+		return;
 
-    pte_t *pt_base = (pte_t *)(uintptr_t)(pd[pd_index] & ~0xFFF);
-    pt_base[pt_index] = 0;
+	pte_t *pt_base = (pte_t *)(uintptr_t)(pd[pd_index] & ~0xFFF);
+	pt_base[pt_index] = 0;
 
-    __asm__ volatile ("invlpg (%0)" : : "r"(virt) : "memory");
+	__asm__ volatile ("invlpg (%0)" : : "r"(virt) : "memory");
 }
 
 /* Returns the physical address mapped to the given virtual address, or 0 if not mapped */
 uintptr_t vmm_get_physical(uintptr_t virt)
 {
-    uint32_t pd_index = virt >> 22;
-    uint32_t pt_index = (virt >> 12) & 0x3FF;
+	uint32_t pd_index = virt >> 22;
+	uint32_t pt_index = (virt >> 12) & 0x3FF;
 
-    if (!(pd[pd_index] & PAGE_PRESENT))
-        return 0;
+	if (!(pd[pd_index] & PAGE_PRESENT))
+		return 0;
 
-    pte_t *pt_base = (pte_t *)(uintptr_t)(pd[pd_index] & ~0xFFF);
+	pte_t *pt_base = (pte_t *)(uintptr_t)(pd[pd_index] & ~0xFFF);
 
-    if (!(pt_base[pt_index] & PAGE_PRESENT))
-        return 0;
+	if (!(pt_base[pt_index] & PAGE_PRESENT))
+		return 0;
 
-    return (pt_base[pt_index] & ~0xFFF) | (virt & 0xFFF);
+	return (pt_base[pt_index] & ~0xFFF) | (virt & 0xFFF);
 }
