@@ -76,6 +76,12 @@ int execute_command(const char* command)
 		return 0;
 	}
 
+	if (ft_strcmp(argv[0], "ls") == 0)
+	{
+		terminal_writestring("/\n");
+		return 0;
+	}
+
 	if (ft_strcmp(argv[0], "shutdown") == 0)
 	{
 		terminal_writestring("Shutting down...\n");
