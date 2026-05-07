@@ -5,8 +5,8 @@ FILES	=	kernel \
 			terminal/terminal_cursor \
 			terminal/terminal_input \
 			terminal/terminal_output \
-			keyboard \
-			keyboard_maps \
+			keyboard/keyboard \
+			keyboard/keyboard_maps \
 			printk \
 			bash/bash \
 			bash/fault \
