@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:28:55 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 22:00:46 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 22:50:18 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 struct idt_entry idt[IDT_SIZE];
 extern void *isr_stub_table[256];
 
-void (*handlers[256])(registers_t *) = {0};
+void (*handlers[256])(registers_t *) = {0}; // Initialize all handlers to NULL
 
 void register_isr_handler(uint8_t int_num, void (*handler)(registers_t *))
 {
@@ -41,6 +41,15 @@ void generic_isr_handler(registers_t *regs)
 	}
 }
 
+/*
+ * On 32-bit processors, the entries in the IDT are 8 bytes long and form a table like this:
+ * Interrupt Descriptor Table (32-bit) 	Address 		Content
+ * IDTR									Offset + 0		Entry 0
+ * IDTR									Offset + 8		Entry 1
+ * IDTR									Offset + 16		Entry 2
+ * ... 	...
+ * IDTR									Offset + 2040	Entry 255 
+*/
 void idt_set_gate(uint8_t num, uint32_t handler_address,
 				  uint16_t selector, uint8_t type_attr)
 {
