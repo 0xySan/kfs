@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:25:32 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:25:33 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 22:59:09 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,18 @@ void handle_arrow_keys(uint8_t arrow_key)
 {
 	struct terminal_screen* screen = terminal_current_screen();
 	size_t min_col = terminal_locked_prefix_col(screen->row);
+
+	/* Up/Down for history navigation */
+	if (arrow_key == 0x48) // Up Arrow
+	{
+		terminal_history_navigate(-1);
+		return;
+	}
+	else if (arrow_key == 0x50) // Down Arrow
+	{
+		terminal_history_navigate(1);
+		return;
+	}
 
 	if (arrow_key == 0x4D) // Right arrow
 	{

@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:29:32 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 21:52:30 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 22:57:09 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,12 @@ struct terminal_screen {
 	size_t preferred_column;
 	uint8_t color;
 	uint8_t ansi_bold;
+    /* Command history */
+    int history_count;
+    int history_next; /* next insertion index */
+    int history_nav; /* -1 when not navigating, otherwise nav offset (0 = last) */
+    char history_temp[128]; /* temporary storage of current input when navigating */
+    char history[32][128];
 };
 
 struct idt_entry {

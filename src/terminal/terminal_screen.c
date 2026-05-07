@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:26:16 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:26:21 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 22:57:56 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,6 +189,14 @@ void terminal_initialize(void)
 {
 	for (size_t screen_id = 0; screen_id < TERMINAL_SCREEN_COUNT; screen_id++)
 	{
+		/* init history */
+		screens[screen_id].history_count = 0;
+		screens[screen_id].history_next = 0;
+		screens[screen_id].history_nav = -1;
+		screens[screen_id].history_temp[0] = '\0';
+		for (size_t h = 0; h < 32; h++)
+			screens[screen_id].history[h][0] = '\0';
+
 		screens[screen_id].row = TERMINAL_PROMPT_ROW;
 		screens[screen_id].column = TERMINAL_PROMPT_COL;
 		screens[screen_id].preferred_column = TERMINAL_PROMPT_COL;

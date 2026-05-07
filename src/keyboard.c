@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:29:07 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 22:06:59 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 23:00:42 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void keyboard_handler(registers_t *_unused)
 		ctrl_held = 0;
 	if (scancode == 0x3A)
 		caps_lock_on = !caps_lock_on;
-	if (scancode == 0x4D || scancode == 0x4B)
+	if (scancode == 0x4D || scancode == 0x4B || scancode == 0x48 || scancode == 0x50)
 		handle_arrow_keys(scancode);
 	if (!(scancode & 0x80)) {
 		if (alt_held && handle_screen_shortcut(scancode))

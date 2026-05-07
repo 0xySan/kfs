@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:30:08 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:34:03 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 22:57:11 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,9 @@ void handle_backspace(void);
 void terminal_newline_with_prompt(void);
 void terminal_write_input(const char* data, size_t size);
 int execute_command(const char* command);
+// History
+void terminal_history_push(const char* command);
+void terminal_history_navigate(int direction); // -1 = up, +1 = down
 
 // Output
 void terminal_putentryat(char c, uint8_t color, size_t x, size_t y);
