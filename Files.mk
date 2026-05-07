@@ -27,4 +27,5 @@ FILES	=	kernel \
 			panic \
 			memory/vmm \
 			memory/kmalloc \
-			idt
+			idt \
+			handler

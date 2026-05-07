@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:29:07 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:29:07 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 22:06:59 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,9 @@ char scancode_to_ascii(uint8_t scancode)
 	return 0;
 }
 
-void keyboard_handler(void)
+void keyboard_handler(registers_t *_unused)
 {
+	(void)_unused; // silence unused parameter warning
 	uint8_t scancode = inb(0x60);
 	if (scancode == 0x2A || scancode == 0x36)
 		shift_held = 1;
@@ -79,5 +80,4 @@ void keyboard_handler(void)
 			terminal_write_input(&c, 1);
 		}
 	}
-	outb(0x20, 0x20);
 }

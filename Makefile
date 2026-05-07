@@ -15,7 +15,7 @@ include Files.mk
 
 SRCS_C = $(addsuffix .c,$(addprefix $(SRCDIR)/,$(FILES)))
 
-SRCS_S	= $(SRCDIR)/boot.s
+SRCS_S	= $(SRCDIR)/boot.s $(SRCDIR)/idt_stubs.s
 OBJDIR	= obj
 OBJS	= $(addprefix $(OBJDIR)/,$(SRCS_S:.s=.o) $(SRCS_C:.c=.o))
 DEPS	= $(OBJS:.o=.d)

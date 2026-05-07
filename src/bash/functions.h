@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:30:01 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:50:50 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 22:12:53 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,6 @@ int help(void);
 int test_malloc(char *argv[]);
 int test_free(char *argv[]);
 int panic(char *argv[]);
-int fault(void);
+int fault(int argc, char **argv);
 
 #endif // FUNCTIONS_H

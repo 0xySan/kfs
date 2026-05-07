@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:25:20 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:36:03 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 21:57:01 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void vmm_map_page(uintptr_t virt, uintptr_t phys, uint32_t flags)
 	{
 		pde_t new_pt_addr = (pde_t)(uintptr_t)pmalloc();
 		if (!new_pt_addr)
-			kpanic("vmm_map_page: out of physical memory");
+			kpanic("vmm_map_page: out of physical memory", NULL);
 		pte_t *new_pt = (pte_t *)(uintptr_t)new_pt_addr;
 		for (int i = 0; i < 1024; i++)
 			new_pt[i] = 0;

@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:29:14 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:53:08 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 22:36:02 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,7 +154,7 @@ int printk(const char *level, const char *format, ...)
 	{
 		if (ft_strcmp(level, "PANIC") == 0 || ft_strcmp(level, "ERROR") == 0)
 			put_string_buf(RED, &b);
-		else if (ft_strcmp(level, "WARN") == 0)
+		else if (ft_strcmp(level, "WARN") == 0 || ft_strcmp(level, "EXCEPTION") == 0)
 			put_string_buf(YELLOW, &b);
 		else
 			put_string_buf(BLUE, &b);

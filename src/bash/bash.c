@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:27:30 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:46:47 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 22:12:59 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ int execute_command(const char* command)
 		return panic(argv);
 
 	if (ft_strcmp(argv[0], "fault") == 0)
-		return fault();
+		return fault(argc, argv);
 
 	if (ft_strcmp(argv[0], "^C") == 0)
 		return 0;

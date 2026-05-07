@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:25:09 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 20:00:08 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 21:55:48 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ static void heap_extend(size_t size)
 	size_t pages = (size + sizeof(block_header_t) + PAGE_SIZE - 1) / PAGE_SIZE;
 
 	if (pages > (HEAP_MAX - heap_end) / PAGE_SIZE)
-		kpanic("kmalloc: requested size exceeds heap limit");
+		kpanic("kmalloc: requested size exceeds heap limit", NULL);
 
 	/* Ensure page tables exist for the virtual range we will map.
 		Allocate and initialize any missing page-table frames first so
@@ -52,7 +52,7 @@ static void heap_extend(size_t size)
 			{
 				void *pt_frame = pmalloc();
 				if (!pt_frame)
-					kpanic("kmalloc: out of physical memory (pt)");
+					kpanic("kmalloc: out of physical memory (pt)", NULL);
 
 				/* Zero the new page table. The frame should be a low
 					physical address (identity-mapped) because we allocate
@@ -74,11 +74,11 @@ static void heap_extend(size_t size)
 	{
 		// Check if we've reached the heap limit before mapping each page.
 		if (heap_end >= HEAP_MAX)
-			kpanic("kmalloc: heap exhausted");
+			kpanic("kmalloc: heap exhausted", NULL);
 
 		void *frame = pmalloc();
 		if (!frame)
-			kpanic("kmalloc: out of physical memory");
+			kpanic("kmalloc: out of physical memory", NULL);
 		/* Map the new page into the heap's virtual address space.
 			The frame should be identity-mapped, so we can use its physical address directly. */
 		vmm_map_page(heap_end, (uintptr_t)frame, PAGE_PRESENT | PAGE_RW);
@@ -99,7 +99,7 @@ void *kmalloc(size_t size)
 		return NULL;
 
 	if (size > HEAP_MAX - HEAP_START)
-		kpanic("kmalloc: requested size too large");
+		kpanic("kmalloc: requested size too large", NULL);
 
 	/* If the heap hasn't been initialized yet, set it up with one page. */
 	if (!heap_start)

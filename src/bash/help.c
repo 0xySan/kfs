@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:27:51 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:50:44 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 22:37:15 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,5 +26,6 @@ int help(void)
 	terminal_writestring("free\t -\tShow free memory frames (usage: free {virtual|frames})\n");
 	terminal_writestring("panic\t - \tTrigger a kernel panic (usage: panic {warn|error})\n");
 	terminal_writestring("fault\t - \tTrigger a page fault\n");
+	terminal_writestring("malloc\t - \tTest the kmalloc implementation (usage: malloc [number_of_bytes] [{free|1|true} to free])\n");
 	return 0;
 }

@@ -6,13 +6,40 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:28:55 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:28:55 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 22:00:46 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/kernel.h"
 
 struct idt_entry idt[IDT_SIZE];
+extern void *isr_stub_table[256];
+
+void (*handlers[256])(registers_t *) = {0};
+
+void register_isr_handler(uint8_t int_num, void (*handler)(registers_t *))
+{
+	handlers[int_num] = handler;
+}
+
+void generic_isr_handler(registers_t *regs)
+{
+	uint32_t int_num = regs->int_num;
+
+	// Call the registered handler for this interrupt, if it exists
+	if (handlers[int_num])
+		handlers[int_num](regs);
+	else
+		printk("INT", "Unhandled interrupt: %u\n", int_num);
+
+	// Send End of Interrupt (EOI) signal to PICs if this is an IRQ
+	if (int_num >= 32)
+	{
+		if (int_num >= 40)
+			outb(0xA0, 0x20);	// slave EOI
+		outb(0x20, 0x20);		// master EOI
+	}
+}
 
 void idt_set_gate(uint8_t num, uint32_t handler_address,
 				  uint16_t selector, uint8_t type_attr)
@@ -30,6 +57,8 @@ void idt_init(void)
 	ptr.limit = (sizeof(struct idt_entry) * IDT_SIZE) - 1;
 	ptr.base  = (uintptr_t)&idt;
 	load_idt(&ptr);
+	for (int i = 0; i < IDT_SIZE; i++)
+		idt_set_gate(i, (uintptr_t)isr_stub_table[i], 0x08, 0x8E);
 }
 
 void pic_init(void)

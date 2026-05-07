@@ -27,7 +27,7 @@ size_t kmsize(void *ptr);
 void kfree(void *ptr);
 
 // needed from kernel.c to avoid circular include
-void kpanic(const char *msg);
+void kpanic(const char *msg, registers_t *regs);
 void kwarn(const char *msg);
 
 #endif /* MEMORY_H */

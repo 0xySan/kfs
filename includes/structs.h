@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:29:32 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:29:32 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 21:52:30 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,17 +119,17 @@ typedef struct {
 } __attribute__((packed)) multiboot_mmap_entry_t;
 
 typedef struct {
-    uint16_t limit_low;    // bits 0-15 de la limite
-    uint16_t base_low;     // bits 0-15 de la base
-    uint8_t  base_mid;     // bits 16-23 de la base
-    uint8_t  access;       // droits d'accès (le plus important)
-    uint8_t  granularity;  // flags + bits 16-19 de la limite
-    uint8_t  base_high;    // bits 24-31 de la base
+	uint16_t limit_low;    // bits 0-15 de la limite
+	uint16_t base_low;     // bits 0-15 de la base
+	uint8_t  base_mid;     // bits 16-23 de la base
+	uint8_t  access;       // droits d'accès (le plus important)
+	uint8_t  granularity;  // flags + bits 16-19 de la limite
+	uint8_t  base_high;    // bits 24-31 de la base
 } __attribute__((packed)) gdt_entry_t;
 
 typedef struct {
-    uint16_t limit;   // taille totale de la GDT - 1
-    uint32_t base;    // adresse de la GDT
+	uint16_t limit;   // taille totale de la GDT - 1
+	uint32_t base;    // adresse de la GDT
 } __attribute__((packed)) gdtr_t;
 
 typedef uint32_t pde_t;   // Page Directory Entry
@@ -137,9 +137,17 @@ typedef uint32_t pte_t;   // Page Table Entry
 
 typedef struct block_header
 {
-    size_t              size;
-    int                 free;
-    struct block_header *next;
+	size_t              size;
+	int                 free;
+	struct block_header *next;
 } block_header_t;
+
+typedef struct registers_s
+{
+	uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
+	uint32_t int_num;
+	uint32_t error_code;
+	uint32_t eip, cs, eflags;
+} registers_t;
 
 #endif // STRUCTS_H

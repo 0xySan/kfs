@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:29:39 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:38:47 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 22:06:27 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,8 @@
 
 void load_idt(struct idt_ptr *ptr);
 void gdt_init(void);
-void keyboard_handler_stub(void);
-void page_fault_handler_stub(void);
-void page_fault_handler(uint32_t error_code);
-void keyboard_handler(void);
+void page_fault_handler(registers_t *regs);
+void keyboard_handler(registers_t *_unused);
 void idt_set_gate(uint8_t num, uint32_t handler_address, uint16_t selector, uint8_t type_attr);
 void idt_init(void);
 void pic_init(void);
@@ -42,6 +40,8 @@ void kernel_set_multiboot_info(multiboot_info_t *mbi);
 void kernel_print_multiboot_flags(void);
 void kshow_free_space(void);
 void kwarn(const char *msg);
-void kpanic(const char *msg);
+void kpanic(const char *msg, registers_t *regs);
+void register_isr_handler(uint8_t int_num, void (*handler)(registers_t *));
+void register_exception_handlers(void);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:25:14 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:36:00 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 21:56:53 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void *pmalloc(void)
 			}
 		}
 	}
-	kpanic("pfa_alloc_frame: out of physical memory");
+	kpanic("pfa_alloc_frame: out of physical memory", NULL);
 	return NULL;
 }
 
@@ -60,7 +60,7 @@ void pfree(void *frame)
 void pfa_init(multiboot_info_t *mbi)
 {
 	if (!(mbi->flags & (1 << 6)))
-		kpanic("Memory map not provided by multiboot");
+		kpanic("Memory map not provided by multiboot", NULL);
 
 	multiboot_mmap_entry_t *entry = (multiboot_mmap_entry_t *)(uintptr_t)mbi->mmap_addr;
 	while ((uintptr_t)entry < mbi->mmap_addr + mbi->mmap_length)
