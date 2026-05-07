@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 22:40:09 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 22:40:09 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 23:51:25 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,4 +197,5 @@ void register_exception_handlers(void)
 	// 20-31 are reserved by Intel
 	// 32-255 are for user-defined IRQ handlers and software interrupts
 	register_isr_handler(33, keyboard_handler); // IRQ1 - keyboard interrupt
+	register_isr_handler(128, syscall_handler); // INT 128 - syscall interrupt
 }

@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:29:32 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 22:57:09 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 23:54:01 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,5 +155,7 @@ typedef struct registers_s
 	uint32_t error_code;
 	uint32_t eip, cs, eflags;
 } registers_t;
+
+typedef uint32_t (*syscall_fn_t)(registers_t *regs);
 
 #endif // STRUCTS_H

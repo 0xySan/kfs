@@ -6,6 +6,7 @@ FILES	=	kernel \
 			terminal/terminal_input \
 			terminal/terminal_output \
 			keyboard \
+			keyboard_maps \
 			printk \
 			bash/bash \
 			bash/fault \
@@ -19,6 +20,7 @@ FILES	=	kernel \
 			bash/paging \
 			bash/test_malloc \
 			bash/test_free \
+			bash/layout \
 			bash/panic \
 			helpers \
 			memory/pfa \
@@ -28,4 +30,5 @@ FILES	=	kernel \
 			memory/vmm \
 			memory/kmalloc \
 			idt_init \
-			handler
+			handler \
+			syscall

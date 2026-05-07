@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:29:50 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:29:50 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 23:53:51 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,5 +29,7 @@ extern uint32_t	*bitmap;		// pointer to where bitmap lives in RAM
 extern uint32_t	bitmap_size;	// number of uint32_t entries
 extern uint32_t	mem_start;		// first managed frame address
 extern uint32_t	total_frames;	// total frames being tracked
+
+extern syscall_fn_t syscall_table[];
 
 #endif // EXTERN_H

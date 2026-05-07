@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:50:58 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 22:35:29 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/08 00:07:35 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ int fault(int argc, char **argv)
 		printk("BASH", "  6 - Invalid opcode (INT 6)\n");
 		printk("BASH", "  13 - General protection fault (INT 13)\n");
 		printk("BASH", "  14 - Page fault (INT 14)\n");
+		printk("BASH", "  128 - Syscall (INT 128)\n");
 		return (1);
 	}
 	int handler = atoi(argv[1]);
@@ -65,6 +66,20 @@ int fault(int argc, char **argv)
 		volatile int *p = (int *)0xdeadbeef;
 		int x = *p;
 		(void)x;
+	}
+	else if (handler == 128)
+	{
+		printk("BASH", "Testing INT 128 - Syscall\n");
+		__asm__ volatile (
+			"mov $1, %%eax\n"        // syscall number 1 (sys_exit)
+			"mov $0x1234, %%ebx\n"   // arg1 (4660 in decimal)
+			"mov $0x5678, %%ecx\n"   // arg2 (22136 in decimal)
+			"mov $0x9abc, %%edx\n"   // arg3 (39612 in decimal)
+			"mov $0xdef0, %%esi\n"   // arg4 (57328 in decimal)
+			"mov $0x1357, %%edi\n"   // arg5 (4951 in decimal)
+			"int $0x80"
+			::: "eax", "ebx", "ecx", "edx", "esi", "edi"
+		);
 	}
 	else
 		printk("BASH", "Invalid handler number\n");

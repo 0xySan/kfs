@@ -6,29 +6,26 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:29:35 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:29:35 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/08 00:35:17 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef KEYBOARD_H
 # define KEYBOARD_H
 
-static const char scancode_map[128] = {
-	0,   0,  '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
-	'-', '=', '\b',   '\t',  'q', 'w', 'e', 'r', 't', 'y', 'u', 'i',
-	'o', 'p', '[', ']', '\n', 0, 'a', 's', 'd', 'f', 'g', 'h',
-	'j', 'k', 'l', ';', '\'', '`', 0, '\\', 'z', 'x', 'c', 'v',
-	'b', 'n', 'm', ',', '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0
-};
+#include "../../includes/structs.h"
+#include "../../includes/inline.h"
+#include "../terminal/terminal.h"
 
-static const char shift_scancode_map[128] = {
-	0,   0,  '!', '@', '#', '$', '%', '^', '&', '*', '(', ')',
-	'_', '+', '\b',   '\t',  'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I',
-	'O', 'P', '{', '}', '\n', 0, 'A', 'S', 'D', 'F', 'G', 'H',
-	'J', 'K', 'L', ':', '"', '~', 0, '|', 'Z', 'X', 'C', 'V',
-	'B', 'N', 'M', '<' , '>' , '?', 0, '*', 0, ' ', 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0
-};
+extern const unsigned char scancode_map[128];
+extern const unsigned char shift_scancode_map[128];
+extern const unsigned char scancode_map_azerty[128];
+extern const unsigned char shift_scancode_map_azerty[128];
+
+extern const unsigned char *used_map;
+extern const unsigned char *used_shift_map;
+
+void keyboard_handler(registers_t *_unused);
+void handle_backspace(void);
 
 #endif // KEYBOARD_H

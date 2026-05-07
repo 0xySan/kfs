@@ -6,11 +6,11 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:29:07 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 23:00:42 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/08 00:32:19 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/kernel.h"
+#include "keyboard.h"
 
 static int shift_held = 0;
 static int caps_lock_on = 0;
@@ -29,14 +29,18 @@ static int handle_screen_shortcut(uint8_t scancode)
 
 char scancode_to_ascii(uint8_t scancode)
 {
-	if (shift_held) {
-		if (scancode < 128)
-			return shift_scancode_map[scancode];
+	if (scancode >= 128)
 		return 0;
-	}
-	if (scancode < 128)
-		return scancode_map[scancode];
-	return 0;
+
+	unsigned char val;
+	if (shift_held)
+		val = used_shift_map[scancode];
+	else
+		val = used_map[scancode];
+
+	if (val == 0)
+		return 0;
+	return (char)val;
 }
 
 void keyboard_handler(registers_t *_unused)

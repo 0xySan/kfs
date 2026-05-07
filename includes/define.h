@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:29:55 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:29:56 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/07 23:59:59 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,5 +118,16 @@ enum vga_color {
 #define WHITE_BG "\e[47m"
 
 #define RESET "\e[0m"
+
+#define SYSCALL_COUNT (sizeof(syscall_table) / sizeof(syscall_table[0]))
+
+#define SYS_RESTART     0
+#define SYS_EXIT        1
+#define SYS_FORK        2
+#define SYS_READ        3
+#define SYS_WRITE       4
+#define SYS_OPEN        5
+#define SYS_CLOSE       6
+// ...
 
 #endif // DEFINE_H

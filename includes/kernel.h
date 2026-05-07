@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:29:39 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 22:06:27 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/08 00:35:29 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,14 @@
 # include "helpers.h"
 # include "structs.h"
 # include "inline.h"
-# include "keyboard.h"
 # include "extern.h"
 # include "../src/terminal/terminal.h"
 # include "../src/memory/memory.h"
+# include "../src/keyboard/keyboard.h"
 
 void load_idt(struct idt_ptr *ptr);
 void gdt_init(void);
 void page_fault_handler(registers_t *regs);
-void keyboard_handler(registers_t *_unused);
 void idt_set_gate(uint8_t num, uint32_t handler_address, uint16_t selector, uint8_t type_attr);
 void idt_init(void);
 void pic_init(void);
@@ -43,5 +42,6 @@ void kwarn(const char *msg);
 void kpanic(const char *msg, registers_t *regs);
 void register_isr_handler(uint8_t int_num, void (*handler)(registers_t *));
 void register_exception_handlers(void);
+void syscall_handler(registers_t *regs);
 
 #endif
