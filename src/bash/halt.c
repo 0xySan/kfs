@@ -1,26 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   helpers.h                                          :+:      :+:    :+:   */
+/*   halt.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/05/07 01:29:47 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:34:56 by etaquet          ###   ########.fr       */
+/*   Created: 2026/05/07 01:27:49 by etaquet           #+#    #+#             */
+/*   Updated: 2026/05/07 01:54:44 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HELPERS_H
-# define HELPERS_H
+#include "functions.h"
 
-#include "define.h"
+void kernel_halt_forever(void)
+{
+	for (;;)
+		__asm__ volatile ("hlt");
+}
 
-int atoi(const char* str);
-size_t split_words(char* line, char** argv, size_t max_args);
-int ft_strcmp(const char* a, const char* b);
-size_t ft_strlcpy(char* dst, const char* src, size_t dst_size);
-size_t strlen(const char* str);
-uint32_t read_cr2(void);
-uint32_t read_cr0(void);
-
-#endif
+int halt(void)
+{
+	printk("HALT", "Halting forever and ever...\n");
+	kernel_halt_forever();
+	return 0;
+}

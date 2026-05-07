@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   define.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/05/07 01:29:55 by etaquet           #+#    #+#             */
+/*   Updated: 2026/05/07 01:29:56 by etaquet          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef DEFINE_H
 #define DEFINE_H
 
@@ -77,11 +89,34 @@ enum vga_color {
 #define PAGE_RW         (1 << 1)
 #define PAGE_USER       (1 << 2)
 
-#define USER_SPACE_START    0x00000000
-#define USER_SPACE_END      0xBFFFFFFF
-#define KERNEL_SPACE_START  0xC0000000
-#define KERNEL_SPACE_END    0xFFFFFFFF
+#define USER_SPACE_START	0x00000000
+#define USER_SPACE_END		0xBFFFFFFF
+#define KERNEL_SPACE_START	0xC0000000
+#define KERNEL_SPACE_END	0xFFFFFFFF
 // 0x00000000 - 0xBFFFFFFF  → user space   (3 GB)
 // 0xC0000000 - 0xFFFFFFFF  → kernel space (1 GB)
+
+#define HEAP_START	0xC0000000
+#define HEAP_MAX	0xCFFFFFFF
+
+#define BLACK "\e[1;30m"
+#define BLUE "\e[1;31m"
+#define GREEN "\e[1;32m"
+#define CYAN "\e[1;33m"
+#define RED "\e[1;34m"
+#define MAGENTA "\e[1;35m"
+#define YELLOW "\e[1;36m"
+#define WHITE "\e[1;37m"
+
+#define BLACK_BG "\e[40m"
+#define BLUE_BG "\e[41m"
+#define GREEN_BG "\e[42m"
+#define CYAN_BG "\e[43m"
+#define RED_BG "\e[44m"
+#define MAGENTA_BG "\e[45m"
+#define YELLOW_BG "\e[46m"
+#define WHITE_BG "\e[47m"
+
+#define RESET "\e[0m"
 
 #endif // DEFINE_H

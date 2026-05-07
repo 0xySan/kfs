@@ -1,4 +1,16 @@
-#include "../includes/kernel.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   vmm.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/05/07 01:25:20 by etaquet           #+#    #+#             */
+/*   Updated: 2026/05/07 01:36:03 by etaquet          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "memory.h"
 
 // VMM (Virtual Memory Manager) - manages virtual addresses, maps them to physical frames using the page tables
 
@@ -11,7 +23,7 @@ void vmm_map_page(uintptr_t virt, uintptr_t phys, uint32_t flags)
 
 	if (!(pd[pd_index] & PAGE_PRESENT))
 	{
-		pde_t new_pt_addr = (pde_t)(uintptr_t)pfa_alloc_frame();
+		pde_t new_pt_addr = (pde_t)(uintptr_t)pmalloc();
 		if (!new_pt_addr)
 			kpanic("vmm_map_page: out of physical memory");
 		pte_t *new_pt = (pte_t *)(uintptr_t)new_pt_addr;

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   helpers.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/05/07 01:28:52 by etaquet           #+#    #+#             */
+/*   Updated: 2026/05/07 01:32:53 by etaquet          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/helpers.h"
 
 int atoi(const char* str)
@@ -77,4 +89,18 @@ size_t strlen(const char* str)
 	while (str[len])
 		len++;
 	return len;
+}
+
+uint32_t read_cr0(void)
+{
+	uint32_t cr0;
+	__asm__ volatile ("mov %%cr0, %0" : "=r"(cr0));
+	return cr0;
+}
+
+uint32_t read_cr2(void)
+{
+    uint32_t cr2;
+    __asm__ volatile ("mov %%cr2, %0" : "=r"(cr2));
+    return cr2;
 }

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   printk.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/05/07 01:29:14 by etaquet           #+#    #+#             */
+/*   Updated: 2026/05/07 01:53:08 by etaquet          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/kernel.h"
 
 /* Internal print buffer - avoids flushing VGA for every single character.
@@ -140,9 +152,17 @@ int printk(const char *level, const char *format, ...)
 	written = 0;
 	if (level)
 	{
+		if (ft_strcmp(level, "PANIC") == 0 || ft_strcmp(level, "ERROR") == 0)
+			put_string_buf(RED, &b);
+		else if (ft_strcmp(level, "WARN") == 0)
+			put_string_buf(YELLOW, &b);
+		else
+			put_string_buf(BLUE, &b);
 		put_char_buf('[', &b);
 		put_string_buf(level, &b);
-		put_string_buf("] ", &b);
+		put_string_buf("]", &b);
+		put_string_buf(RESET, &b);
+		put_char_buf(' ', &b);
 	}
 	va_start(args, format);
 	written += vkprintf_buf(format, args, &b);

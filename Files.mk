@@ -1,11 +1,30 @@
 FILES	=	kernel \
-			terminal \
+			terminal/terminal_screen \
+			terminal/terminal_color \
+			terminal/terminal_render \
+			terminal/terminal_cursor \
+			terminal/terminal_input \
+			terminal/terminal_output \
 			keyboard \
 			printk \
-			bash \
+			bash/bash \
+			bash/fault \
+			bash/dump \
+			bash/shutdown \
+			bash/reboot \
+			bash/halt \
+			bash/flags \
+			bash/echo \
+			bash/help \
+			bash/paging \
+			bash/test_malloc \
+			bash/test_free \
+			bash/panic \
 			helpers \
-			pfa \
+			memory/pfa \
 			gdt \
-			paging \
-			vmm \
-			panic
+			memory/paging \
+			panic \
+			memory/vmm \
+			memory/kmalloc \
+			idt

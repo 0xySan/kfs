@@ -1,26 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   helpers.h                                          :+:      :+:    :+:   */
+/*   panic.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/05/07 01:29:47 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:34:56 by etaquet          ###   ########.fr       */
+/*   Created: 2026/05/07 01:28:23 by etaquet           #+#    #+#             */
+/*   Updated: 2026/05/07 01:28:24 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HELPERS_H
-# define HELPERS_H
+#include "functions.h"
 
-#include "define.h"
-
-int atoi(const char* str);
-size_t split_words(char* line, char** argv, size_t max_args);
-int ft_strcmp(const char* a, const char* b);
-size_t ft_strlcpy(char* dst, const char* src, size_t dst_size);
-size_t strlen(const char* str);
-uint32_t read_cr2(void);
-uint32_t read_cr0(void);
-
-#endif
+int panic(char *argv[])
+{
+	if (!argv[1])
+		printk("bash", "Usage: panic [warn|error]\n");
+	else if (ft_strcmp(argv[1], "warn") == 0)
+		kwarn("This is a warning message");
+	else if (ft_strcmp(argv[1], "error") == 0)
+		kpanic("This is a panic message");
+	else
+		printk("bash", "Usage: panic [warn|error]\n");
+	return 0;
+}

@@ -1,26 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   helpers.h                                          :+:      :+:    :+:   */
+/*   fault.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/05/07 01:29:47 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:34:56 by etaquet          ###   ########.fr       */
+/*   Created: 2026/05/07 01:50:58 by etaquet           #+#    #+#             */
+/*   Updated: 2026/05/07 01:50:59 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HELPERS_H
-# define HELPERS_H
+#include "functions.h"
 
-#include "define.h"
-
-int atoi(const char* str);
-size_t split_words(char* line, char** argv, size_t max_args);
-int ft_strcmp(const char* a, const char* b);
-size_t ft_strlcpy(char* dst, const char* src, size_t dst_size);
-size_t strlen(const char* str);
-uint32_t read_cr2(void);
-uint32_t read_cr0(void);
-
-#endif
+int fault(void)
+{
+	printk("BASH", "This is a test of the page fault handler. It will attempt to read from an invalid address, which should trigger a page fault and invoke the handler.\n");
+	volatile int *ptr = (int *)0xDEADBEEF; // Invalid address
+	int value = *ptr; // This should cause a page fault
+	(void)value; // Suppress unused variable warning
+	return 0;
+}

@@ -23,17 +23,17 @@ DEPS	= $(OBJS:.o=.d)
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	@echo -e "\tLD $@"
+	@printf "\tLD $@\n"
 	@ld -T $(LDSCRIPT) -o $(NAME) $(LDFLAGS) $(OBJS)
-	@echo "Compilation finished. Output: $(NAME)"
+	@printf "Compilation finished. Output: $(NAME)\n"
 
 $(OBJDIR)/%.o: %.c
-	@echo -e "\tCC $<"
+	@printf "\tCC $<\n"
 	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
 
 $(OBJDIR)/%.o: %.s
-	@echo -e "\tAS $<"
+	@printf "\tAS $<\n"
 	@mkdir -p $(dir $@)
 	@$(AS) $(ASFLAGS) $< -o $@
 

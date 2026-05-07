@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   kernel.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/05/07 01:29:39 by etaquet           #+#    #+#             */
+/*   Updated: 2026/05/07 01:38:47 by etaquet          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef KERNEL_H
 # define KERNEL_H
 
@@ -5,30 +17,31 @@
 # include "define.h"
 # include "helpers.h"
 # include "structs.h"
-# include "functions.h"
 # include "inline.h"
+# include "keyboard.h"
+# include "extern.h"
+# include "../src/terminal/terminal.h"
+# include "../src/memory/memory.h"
 
-static const char scancode_map[128] = {
-	0,   0,  '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
-	'-', '=', '\b',   '\t',  'q', 'w', 'e', 'r', 't', 'y', 'u', 'i',
-	'o', 'p', '[', ']', '\n', 0, 'a', 's', 'd', 'f', 'g', 'h',
-	'j', 'k', 'l', ';', '\'', '`', 0, '\\', 'z', 'x', 'c', 'v',
-	'b', 'n', 'm', ',', '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0
-};
-
-static const char shift_scancode_map[128] = {
-	0,   0,  '!', '@', '#', '$', '%', '^', '&', '*', '(', ')',
-	'_', '+', '\b',   '\t',  'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I',
-	'O', 'P', '{', '}', '\n', 0, 'A', 'S', 'D', 'F', 'G', 'H',
-	'J', 'K', 'L', ':', '"', '~', 0, '|', 'Z', 'X', 'C', 'V',
-	'B', 'N', 'M', '<' , '>' , '?', 0, '*', 0, ' ', 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0
-};
-
-extern pde_t pd[1024];
-extern pte_t pt[1024];
-
-extern uint32_t kernel_end;
+void load_idt(struct idt_ptr *ptr);
+void gdt_init(void);
+void keyboard_handler_stub(void);
+void page_fault_handler_stub(void);
+void page_fault_handler(uint32_t error_code);
+void keyboard_handler(void);
+void idt_set_gate(uint8_t num, uint32_t handler_address, uint16_t selector, uint8_t type_attr);
+void idt_init(void);
+void pic_init(void);
+void handle_backspace(void);
+int kprintf(const char *format, ...);
+int printk(const char *level, const char *format, ...);
+void kernel_shutdown(void);
+void kernel_reboot(void);
+void kernel_halt_forever(void);
+void kernel_set_multiboot_info(multiboot_info_t *mbi);
+void kernel_print_multiboot_flags(void);
+void kshow_free_space(void);
+void kwarn(const char *msg);
+void kpanic(const char *msg);
 
 #endif

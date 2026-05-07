@@ -1,26 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   helpers.h                                          :+:      :+:    :+:   */
+/*   paging.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/05/07 01:29:47 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:34:56 by etaquet          ###   ########.fr       */
+/*   Created: 2026/05/07 01:27:55 by etaquet           #+#    #+#             */
+/*   Updated: 2026/05/07 01:27:56 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HELPERS_H
-# define HELPERS_H
+#include "functions.h"
 
-#include "define.h"
+int paging(void)
+{
+	uint32_t cr0 = read_cr0();
+	printk("PAGING", "CR0 = 0x%x\n", cr0);
 
-int atoi(const char* str);
-size_t split_words(char* line, char** argv, size_t max_args);
-int ft_strcmp(const char* a, const char* b);
-size_t ft_strlcpy(char* dst, const char* src, size_t dst_size);
-size_t strlen(const char* str);
-uint32_t read_cr2(void);
-uint32_t read_cr0(void);
-
-#endif
+	if (cr0 & (1 << 31))
+		printk("PAGING", "Paging ENABLED\n");
+	else
+		printk("PAGING", "Paging DISABLED\n");
+	return 0;
+}

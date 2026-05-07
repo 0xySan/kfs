@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   paging.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abosc <abosc@42lehavre.fr>                 +#+  +:+       +#+        */
+/*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/03 21:13:44 by abosc             #+#    #+#             */
-/*   Updated: 2026/05/03 22:47:53 by abosc            ###   ########.fr       */
+/*   Updated: 2026/05/07 01:35:56 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/kernel.h"
+#include "memory.h"
 
 pde_t pd[1024] __attribute__((aligned(4096)));
 pte_t pt[1024] __attribute__((aligned(4096)));

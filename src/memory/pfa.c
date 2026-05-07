@@ -1,9 +1,21 @@
-#include "../includes/kernel.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pfa.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/05/07 01:25:14 by etaquet           #+#    #+#             */
+/*   Updated: 2026/05/07 01:36:00 by etaquet          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-static uint32_t *bitmap;       // pointer to where bitmap lives in RAM
-static uint32_t  bitmap_size;  // number of uint32_t entries
-static uint32_t  mem_start;    // first managed frame address
-static uint32_t  total_frames; // total frames being tracked
+#include "memory.h"
+
+uint32_t	*bitmap;		// pointer to where bitmap lives in RAM
+uint32_t	bitmap_size;	// number of uint32_t entries
+uint32_t	mem_start;		// first managed frame address
+uint32_t	total_frames;	// total frames being tracked
 
 // PFA (Physical Frame Allocator) - manages physical RAM, hands out 4KB frames
 
@@ -17,25 +29,26 @@ static void pfa_set_bit(uint32_t frame_index)
 	bitmap[frame_index / 32] |= (1 << (frame_index % 32));
 }
 
-void *pfa_alloc_frame(void)
+void *pmalloc(void)
 {
 	for (uint32_t i = 0; i < bitmap_size; i++)
 	{
 		if (bitmap[i] == 0xFFFFFFFF)
-			continue; // no free frame in this uint32_t, skip
+			continue;
 		for (uint32_t j = 0; j < 32; j++)
 		{
 			if (!(bitmap[i] & (1 << j)))
 			{
 				pfa_set_bit(i * 32 + j);
-				return (void *)(uintptr_t)(mem_start + (i * 32 + j) * PAGE_SIZE);
+				return (void *)((uintptr_t)(mem_start + (i * 32 + j) * PAGE_SIZE));
 			}
 		}
 	}
-	return (void *)0; // out of memory
+	kpanic("pfa_alloc_frame: out of physical memory");
+	return NULL;
 }
 
-void pfa_free_frame(void *frame)
+void pfree(void *frame)
 {
 	if ((uintptr_t)frame < mem_start) return;
 	if ((uintptr_t)frame % PAGE_SIZE != 0) return;
@@ -98,12 +111,7 @@ void pfa_mark_used(uintptr_t start, size_t size)
 		pfa_set_bit(first_frame + i);
 }
 
-void show_free_frames()
+size_t pmsize(void)
 {
-	uint32_t free_count = 0;
-	for (uint32_t i = 0; i < total_frames; i++)
-		if (!(bitmap[i / 32] & (1 << (i % 32))))
-			free_count++;
-
-	printk("PFA", "free frames=%u (%u MB)\n", free_count, free_count * 4 / 1024);
+	return PAGE_SIZE;
 }

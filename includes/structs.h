@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   structs.h                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/05/07 01:29:32 by etaquet           #+#    #+#             */
+/*   Updated: 2026/05/07 01:29:32 by etaquet          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef STRUCTS_H
 # define STRUCTS_H
 
@@ -12,6 +24,7 @@ struct terminal_screen {
 	size_t column;
 	size_t preferred_column;
 	uint8_t color;
+	uint8_t ansi_bold;
 };
 
 struct idt_entry {
@@ -121,5 +134,12 @@ typedef struct {
 
 typedef uint32_t pde_t;   // Page Directory Entry
 typedef uint32_t pte_t;   // Page Table Entry
+
+typedef struct block_header
+{
+    size_t              size;
+    int                 free;
+    struct block_header *next;
+} block_header_t;
 
 #endif // STRUCTS_H
