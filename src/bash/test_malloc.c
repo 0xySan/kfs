@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:28:41 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 01:37:10 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/09 21:46:33 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,37 @@
 
 void kshow_free_space(void)
 {
+	block_header_t	*current;
+	size_t			free_bytes;
+	size_t			used_bytes;
+	size_t			free_blocks;
+	size_t			used_blocks;
+
 	if (!heap_start)
 	{
 		printk("HEAP", "heap not initialized\n");
 		return;
 	}
 
-	size_t free_bytes = 0;
-	size_t used_bytes = 0;
-
-	block_header_t *current = heap_start;
+	free_bytes = used_bytes = free_blocks = used_blocks = 0;
+	current = heap_start;
 	while (current)
 	{
 		if (current->free)
+		{
 			free_bytes += current->size;
+			free_blocks++;
+		}
 		else
+		{
 			used_bytes += current->size;
+			used_blocks++;
+		}
 		current = current->next;
 	}
 
-	printk("HEAP", "free:  %u bytes\n", free_bytes);
-	printk("HEAP", "used:  %u bytes\n", used_bytes);
+	printk("HEAP", "free:  %u bytes (%u blocks)\n", free_bytes, free_blocks);
+	printk("HEAP", "used:  %u bytes (%u blocks)\n", used_bytes, used_blocks);
 	printk("HEAP", "total: %u bytes\n", free_bytes + used_bytes);
 }
 

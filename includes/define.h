@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:29:55 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/07 23:59:59 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/09 21:44:33 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ typedef __builtin_va_list va_list;
 
 #define PAGE_SIZE 4096
 #define ALIGN_UP(addr) (((addr) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
+#define ALIGN_DOWN(addr) ((uintptr_t)(addr) & ~((uintptr_t)(PAGE_SIZE - 1)))
 
 enum vga_color {
 	VGA_COLOR_BLACK = 0,
