@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:30:01 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/08 00:21:16 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/09 05:30:39 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ int help(void);
 int test_malloc(char *argv[]);
 int test_free(char *argv[]);
 int panic(char *argv[]);
+int signal_cmd(char *argv[]);
 int fault(int argc, char **argv);
 int layout_switcher(int argc, char **argv);
 

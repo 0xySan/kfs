@@ -22,6 +22,7 @@ FILES	=	kernel \
 			bash/test_free \
 			bash/layout \
 			bash/panic \
+			bash/signal \
 			helpers \
 			memory/pfa \
 			gdt \
@@ -31,4 +32,5 @@ FILES	=	kernel \
 			memory/kmalloc \
 			idt_init \
 			handler \
-			syscall
+			syscall \
+			signals

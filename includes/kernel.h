@@ -6,7 +6,7 @@
 /*   By: etaquet <etaquet@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 01:29:39 by etaquet           #+#    #+#             */
-/*   Updated: 2026/05/08 00:35:29 by etaquet          ###   ########.fr       */
+/*   Updated: 2026/05/09 05:26:47 by etaquet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,14 @@ void kernel_print_multiboot_flags(void);
 void kshow_free_space(void);
 void kwarn(const char *msg);
 void kpanic(const char *msg, registers_t *regs);
+void panic_clear_registers(registers_t *regs);
+void panic_save_stack(registers_t *regs);
+void panic_dump_stack(void);
 void register_isr_handler(uint8_t int_num, void (*handler)(registers_t *));
 void register_exception_handlers(void);
+void register_signal_callback(uint32_t signal_num, signal_callback_t callback);
+void schedule_signal(uint32_t signal_num, void *payload);
+void process_scheduled_signals(void);
 void syscall_handler(registers_t *regs);
 
 #endif
